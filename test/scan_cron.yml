@@ -1,0 +1,28 @@
+---
+- name: "Test scan_cron - Python 2.7"
+  hosts: "localhost"
+  gather_facts: False
+  vars:
+    ansible_python_interpreter: "/usr/bin/python2.7"
+  tasks:
+    - name: "Scan Cron"
+      scan_cron:
+      become: True
+
+    - name: "Display cron facts"
+      debug:
+        var: "cron"
+
+- name: "Test scan_cron - Python 3.7"
+  hosts: "localhost"
+  gather_facts: False
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3.7"
+  tasks:
+    - name: "Scan Cron"
+      scan_cron:
+      become: True
+
+    - name: "Display cron facts"
+      debug:
+        var: "cron"

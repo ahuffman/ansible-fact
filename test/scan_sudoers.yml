@@ -1,0 +1,27 @@
+---
+- name: "Test scan_sudoers - Python 2.7"
+  hosts: "localhost"
+  gather_facts: False
+  vars:
+    ansible_python_interpreter: "/usr/bin/python2.7"
+  tasks:
+    - name: "Scan Sudoers"
+      scan_sudoers:
+      become: True
+
+    - debug:
+        var: "sudoers"
+
+
+- name: "Test scan_sudoers - Python 3.7"
+  hosts: "localhost"
+  gather_facts: False
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3.7"
+  tasks:
+    - name: "Scan Sudoers"
+      scan_sudoers:
+      become: True
+
+    - debug:
+        var: "sudoers"

@@ -122,16 +122,16 @@ import re
 
 def main():
     module_args = dict(
-            output_raw_configs=dict(
-                type='bool',
-                default=True,
-                required=False
-            ),
-            output_parsed_configs=dict(
-                type='bool',
-                default=True,
-                required=False
-            )
+        output_raw_configs=dict(
+            type='bool',
+            default=True,
+            required=False
+        ),
+        output_parsed_configs=dict(
+            type='bool',
+            default=True,
+            required=False
+        )
     )
 
     result = dict(

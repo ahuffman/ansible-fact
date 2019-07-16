@@ -118,8 +118,7 @@ def main():
         return deny
 
     def get_cron_files():
-        cron_files = dict()
-        cron_files['files'] = list()
+        # standard cron locations for cron file discovery
         cron_paths = [
             "/etc/crontab"
         ]
@@ -131,10 +130,6 @@ def main():
             "/var/spool/cron",
             "/etc/cron.d"
         ]
-        # Regex for parsing
-        comment_re = re.compile(r'^#+')
-        shebang_re = re.compile(r'^(#!\/){1}.*$')
-        variable_re = re.compile(r'^.*=.*$')
 
         # Look for files in cron directories and append to cron_paths
         for dir in cron_dirs:
@@ -144,6 +139,17 @@ def main():
                 cron_dirs += [join(dir, filename) for filename in os.listdir(dir) if isdir(join(dir, filename))]
             except:
                 pass
+        return cron_paths
+
+    def get_cron_data(cron_paths):
+        # Output data
+        cron_data = list()
+        # Regex for parsing data
+        variable_re = re.compile(r'^.*=.*$')
+        comment_re = re.compile(r'^#+')
+        shebang_re = re.compile(r'^(#!\/){1}.*$')
+
+        # work on each file that was found
         for cron in cron_paths:
             job = dict()
             job['path'] = cron
@@ -157,25 +163,27 @@ def main():
                         if comment_re.search(line) is None and line != '' and line != None and line != '\r':
                             job['configuration'].append(str(line))
                         elif shebang_re.search(line) and line != '' and line != None and line != '\r':
-                            job['configuration'].append(str(line))
+                            job['configuration'].append(line)
                 config.close()
-                cron_files['files'].append(job)
+                # append each parsed file
+                cron_data.append(job)
             except:
                 pass
-                # Couldn't open the file - take it out of list
-                cron_paths.remove(cron)
-        cron_files['all_scanned_files'] = cron_paths
-        return cron_files
 
+        return cron_data
+
+    # Do work
     cron_allow = get_cron_allow()
     cron_deny = get_cron_deny()
-    cron_files = get_cron_files()
+    cron_paths = get_cron_files()
+    cron_data = get_cron_data(cron_paths)
 
     # Build output
     cron = dict()
     cron['cron_allow'] = cron_allow
     cron['cron_deny'] = cron_deny
-    cron['cron_files'] = cron_files
+    cron['all_scanned_files'] = cron_paths
+    cron['cron_files'] = cron_data
     result = {'ansible_facts': {'cron': cron}}
 
     module.exit_json(**result)

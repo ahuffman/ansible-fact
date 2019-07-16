@@ -17,7 +17,7 @@ description:
 options:
     output_raw_configs:
         description:
-            - Whether or not to output raw configuration lines (excluding comments) from the scanned sudoers files
+            - Whether or not to output raw configuration lines (excluding comments) from the scanned cron files
         default: True
         required: False
     output_parsed_configs:
@@ -145,15 +145,20 @@ def main():
         # Output data
         cron_data = list()
         # Regex for parsing data
-        variable_re = re.compile(r'^.*=.*$')
+        variable_re = re.compile(r'^([a-zA-Z0-9_-]*)[ \t]*=[ \t]*(.*)$')
         comment_re = re.compile(r'^#+')
-        shebang_re = re.compile(r'^(#!\/){1}.*$')
+        shebang_re = re.compile(r'^(#!){1}(.*)$')
+        # schedule_re = re.compile(r'^([1-9a-zA-Z\*\-\,\/]+)[ \t]+([1-9a-zA-Z\*\-\,\/]+)[ \t]+([1-9a-zA-Z\*\-\,\/]+)[ \t]+([1-9a-zA-Z\*\-\,\/]+)[ \t]+([1-9a-zA-Z\*\-\,\/]+)[ \t]*([a-zA-Z\-\_1-9]*)[ \t]+(.+)$')
 
         # work on each file that was found
         for cron in cron_paths:
             job = dict()
             job['path'] = cron
             job['configuration'] = list()
+            job['data'] = dict()
+            job['data']['variables'] = list()
+            job['data']['schedules'] = list()
+
             try:
                 config = open(cron, 'r')
                 for l in config:
@@ -164,12 +169,57 @@ def main():
                             job['configuration'].append(str(line))
                         elif shebang_re.search(line) and line != '' and line != None and line != '\r':
                             job['configuration'].append(line)
+
+                    # parsed data output
+                    if params['output_parsed_configs']:
+                        variable = dict()
+                        sched = dict()
+                        # Capture script variables
+                        if variable_re.search(line) and line != '' and line != None:
+                            variable['name'] = variable_re.search(line).group(1)
+                            variable['value'] = variable_re.search(line).group(2)
+                            job['data']['variables'].append(variable)
+
+                        # Capture script shell type
+                        if shebang_re.search(line) and line != '' and line != None:
+                            job['data']['shell'] = shebang_re.search(line).group(2)
+
+                        # Capture cron schedules
+                        # schedule_line = line.split()
+                        # if len(schedule_line) > 5:
+                        # # and shebang_re.search(line) is None and variable_re.search(line) is None and comment_re.search(line) is None:
+                        #     # sched['minute'] = schedule_re.search(line).group(1)
+                        #     # sched['hour'] = schedule_re.search(line).group(2)
+                        #     # sched['day_of_month'] = schedule_re.search(line).group(3)
+                        #     # sched['month'] = schedule_re.search(line).group(4)
+                        #     # sched['day_of_week'] = schedule_re.search(line).group(5)
+                        #     # # optional user field in some implementations
+                        #     # sched['user'] = schedule_re.search(line).group(6)
+                        #     # sched['command'] = schedule_re.search(line).group(7)
+                        #     sched['minute'] = schedule_line[0]
+                        #     sched['hour']
+                        #     sched['day_of_month']
+                        #     sched['month']
+                        #     sched['day_of_week']
+                        #     if len(schedule_line) > 5:
+                        #         sched['user'] = schedule_line[5]
+                        #         command = schedule_line[6]
+                        #         for i in schedule_line[7:]:
+                        #             command += " " + i
+                        #         sched['command'] = command
+                        #     else:
+                        #         command = schedule_line[5]
+                        #         for i in schedule_line[6:]:
+                        #             command += " " + i
+                        #         sched['command'] = command
+                        #     job['data']['schedules'].append(sched)
+                        # else:
+                        #     job['data']['schedules'].append('nope')
                 config.close()
                 # append each parsed file
                 cron_data.append(job)
             except:
                 pass
-
         return cron_data
 
     # Do work
@@ -180,10 +230,10 @@ def main():
 
     # Build output
     cron = dict()
-    cron['cron_allow'] = cron_allow
-    cron['cron_deny'] = cron_deny
+    cron['allow'] = cron_allow
+    cron['deny'] = cron_deny
     cron['all_scanned_files'] = cron_paths
-    cron['cron_files'] = cron_data
+    cron['files'] = cron_data
     result = {'ansible_facts': {'cron': cron}}
 
     module.exit_json(**result)

@@ -9,9 +9,27 @@
       scan_sudoers:
       become: True
 
-    - debug:
+    - name: "Display all sudoers data"
+      debug:
         var: "sudoers"
 
+    - name: "Scan Sudoers - no parsed data"
+      scan_sudoers:
+        output_parsed_configs: False
+      become: True
+
+    - name: "Display only sudoers raw configs"
+      debug:
+        var: "sudoers"
+
+    - name: "Scan Sudoers - no raw configuration data"
+      scan_sudoers:
+        output_raw_configs: False
+      become: True
+
+    - name: "Display only sudoers parsed configs"
+      debug:
+        var: "sudoers"
 
 - name: "Test scan_sudoers - Python 3.7"
   hosts: "localhost"
@@ -19,9 +37,28 @@
   vars:
     ansible_python_interpreter: "/usr/bin/python3.7"
   tasks:
-    - name: "Scan Sudoers"
+    - name: "Scan Sudoers - all data"
       scan_sudoers:
       become: True
 
-    - debug:
+    - name: "Display all sudoers data"
+      debug:
+        var: "sudoers"
+
+    - name: "Scan Sudoers - no parsed data"
+      scan_sudoers:
+        output_parsed_configs: False
+      become: True
+
+    - name: "Display only sudoers raw configs"
+      debug:
+        var: "sudoers"
+
+    - name: "Scan Sudoers - no raw configuration data"
+      scan_sudoers:
+        output_raw_configs: False
+      become: True
+
+    - name: "Display only sudoers parsed configs"
+      debug:
         var: "sudoers"

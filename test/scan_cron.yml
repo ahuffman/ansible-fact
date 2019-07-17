@@ -5,11 +5,11 @@
   vars:
     ansible_python_interpreter: "/usr/bin/python2.7"
   tasks:
-    - name: "Scan Cron"
+    - name: "Scan Cron - all data"
       scan_cron:
       become: True
 
-    - name: "Display cron facts"
+    - name: "Display all cron data"
       debug:
         var: "cron"
 
@@ -18,7 +18,7 @@
         output_parsed_configs: False
       become: True
 
-    - name: "Display only raw configs"
+    - name: "Display only cron raw configs"
       debug:
         var: "cron"
 
@@ -27,7 +27,7 @@
         output_raw_configs: False
       become: True
 
-    - name: "Display only parsed data"
+    - name: "Display only cron parsed data"
       debug:
         var: "cron"
 
@@ -37,11 +37,11 @@
   vars:
     ansible_python_interpreter: "/usr/bin/python3.7"
   tasks:
-    - name: "Scan Cron"
+    - name: "Scan Cron - all data"
       scan_cron:
       become: True
 
-    - name: "Display cron facts"
+    - name: "Display all cron data"
       debug:
         var: "cron"
 
@@ -50,7 +50,7 @@
         output_parsed_configs: False
       become: True
 
-    - name: "Display only raw configs"
+    - name: "Display only cron raw configs"
       debug:
         var: "cron"
 
@@ -59,6 +59,6 @@
         output_raw_configs: False
       become: True
 
-    - name: "Display only parsed data"
+    - name: "Display only cron parsed data"
       debug:
         var: "cron"

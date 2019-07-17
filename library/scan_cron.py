@@ -270,19 +270,22 @@ def main():
         for cron in cron_paths:
             job = dict()
             job['path'] = cron
-            job['configuration'] = list()
-            job['data'] = dict()
-            job['data']['variables'] = list()
-            job['data']['schedules'] = list()
 
             try:
+                if params['output_raw_configs']:
+                    job['configuration'] = list()
+                if params['output_parsed_configs']:
+                    job['data'] = dict()
+                    job['data']['variables'] = list()
+                    job['data']['schedules'] = list()
+
                 config = open(cron, 'r')
                 for l in config:
                     line = l.replace('\n', '').replace('\t', '    ')
                     # raw configuration output
                     if params['output_raw_configs']:
                         if comment_re.search(line) is None and line != '' and line != None and line != '\r':
-                            job['configuration'].append(str(line))
+                            job['configuration'].append(line)
                         elif shebang_re.search(line) and line != '' and line != None and line != '\r':
                             job['configuration'].append(line)
 
@@ -290,6 +293,7 @@ def main():
                     if params['output_parsed_configs']:
                         variable = dict()
                         sched = dict()
+
                         # Capture script variables
                         if variable_re.search(line) and line != '' and line != None:
                             variable['name'] = variable_re.search(line).group(1)
@@ -299,6 +303,8 @@ def main():
                         # Capture script shell type
                         if shebang_re.search(line) and line != '' and line != None:
                             job['data']['shell'] = shebang_re.search(line).group(2)
+                        else:
+                            job['data']['shell'] = None
 
                         # Capture cron schedules:
                         ##  don't try if a shell is set on the file, because it's a script at that point

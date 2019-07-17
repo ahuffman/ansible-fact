@@ -31,6 +31,7 @@ All module documentation can be found in each respective module, as with any Ans
 Please feel free to openly contribute to this project.  All code will be reviewed prior to merging.
 
 ### Guidelines
+* Please perform all development and pull requests against the `dev` branch of this repository.
 * If a particular fact collector can apply to many different Operating Systems, please try and accommodate all Operating System implementations in an attempt to keep this project platform agnostic.
 * Please include a test playbook in the [test](test) directory.
 * Please place your modules in the [library](library) directory.

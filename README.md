@@ -1,4 +1,16 @@
 # ansible-fact
+## Table of Contents
+<!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:1 -->
+
+1. [Table of Contents](#table-of-contents)
+2. [About](#about)
+3. [Available Modules](#available-modules)
+4. [Module Documentation](#module-documentation)
+5. [Contributions](#contributions)
+	1. [Guidelines](#guidelines)
+6. [Author(s)](#authors)
+
+<!-- /TOC -->
 
 ## About
 The concept of this project is to perform Infrastructure-as-Code in Reverse (i.e. iacir - pronounced: aya sir).  
@@ -12,8 +24,17 @@ The concept of this project is to perform Infrastructure-as-Code in Reverse (i.e
 | [scan_sudoers](library/scan_sudoers.py) | Collects all sudoers configurations and converts to structured data | [scan_sudoers.yml](test/scan_sudoers.yml) |
 | [scan_user_group](library/scan_user_group.py) | Collects all local user and group data from `/etc/shadow`, `/etc/gshadow`, `/etc/passwd`, and `/etc/group`, and merges into structured data. | [scan_user_group.yml](test/scan_user_group.yml)
 
-## Documentation
+## Module Documentation
 All module documentation can be found in each respective module, as with any Ansible module.
 
-## Author
+## Contributions
+Please feel free to openly contribute to this project.  All code will be reviewed prior to merging.
+
+### Guidelines
+* If a particular fact collector can apply to many different Operating Systems, please try and accommodate all Operating System implementations in an attempt to keep this project platform agnostic.
+* Please include a test playbook in the [test](test) directory.
+* Please place your modules in the [library](library) directory.
+* Please document your code and modules thoroughly via comments and by following [Ansible's Module Development Documentation](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html#starting-a-new-module).
+
+## Author(s)
 [Andrew J. Huffman](https://github.com/ahuffman)

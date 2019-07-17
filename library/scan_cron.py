@@ -13,7 +13,9 @@ module: scan_cron
 short_description: Collects cron job facts
 version_added: "2.8"
 description:
-    - "Collects cron job facts about a system"
+    - "Collects cron job facts from a system."
+    - "The module can display both parsed and raw cron configurations which is useful when some cron jobs are scripts and others are true schedules."
+    - "The display of either raw configurations or parsed configurations can be limited via the module parameters."
 options:
     output_raw_configs:
         description:

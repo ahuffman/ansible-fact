@@ -205,6 +205,7 @@ def main():
         argument_spec=module_args,
         supports_check_mode=True
     )
+
     params = module.params
 
     def get_cron_allow():
@@ -273,22 +274,28 @@ def main():
             job = dict()
             job['path'] = cron
 
-            try:
-                if params['output_raw_configs']:
-                    job['configuration'] = list()
-                if params['output_parsed_configs']:
-                    job['data'] = dict()
-                    job['data']['variables'] = list()
-                    job['data']['schedules'] = list()
+            if params['output_raw_configs']:
+                job['configuration'] = list()
 
+            if params['output_parsed_configs']:
+                job['data'] = dict()
+                job['data']['variables'] = list()
+                job['data']['schedules'] = list()
+                job['data']['shell'] = ''
+
+            # make sure we have permission to open the files
+            try:
                 config = open(cron, 'r')
                 for l in config:
                     line = l.replace('\n', '').replace('\t', '    ')
                     # raw configuration output
                     if params['output_raw_configs']:
-                        if comment_re.search(line) is None and line != '' and line != None and line != '\r':
+                        # Not a comment line
+                        if comment_re.search(line) is None and line != '' and line != None:
                             job['configuration'].append(line)
-                        elif shebang_re.search(line) and line != '' and line != None and line != '\r':
+
+                        # Shebang line
+                        elif shebang_re.search(line) and line != '' and line != None:
                             job['configuration'].append(line)
 
                     # parsed data output
@@ -305,12 +312,10 @@ def main():
                         # Capture script shell type
                         if shebang_re.search(line) and line != '' and line != None:
                             job['data']['shell'] = shebang_re.search(line).group(2)
-                        else:
-                            job['data']['shell'] = None
 
                         # Capture cron schedules:
                         ##  don't try if a shell is set on the file, because it's a script at that point
-                        if schedule_re.search(line) and line != '' and line != None and job['data']['shell'] is None:
+                        if schedule_re.search(line) and line != '' and line != None and job['data']['shell'] == '':
                             sched['minute'] = schedule_re.search(line).group(1)
                             sched['hour'] = schedule_re.search(line).group(2)
                             sched['day_of_month'] = schedule_re.search(line).group(3)
@@ -322,10 +327,12 @@ def main():
                             sched['command'] = schedule_re.search(line).group(7)
                             job['data']['schedules'].append(sched)
                 config.close()
-                # append each parsed file
-                cron_data.append(job)
+
             except:
                 pass
+
+            # append each parsed file
+            cron_data.append(job)
         return cron_data
 
     # Do work

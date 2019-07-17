@@ -148,7 +148,7 @@ def main():
         variable_re = re.compile(r'^([a-zA-Z0-9_-]*)[ \t]*=[ \t]*(.*)$')
         comment_re = re.compile(r'^#+')
         shebang_re = re.compile(r'^(#!){1}(.*)$')
-        # schedule_re = re.compile(r'^([1-9a-zA-Z\*\-\,\/]+)[ \t]+([1-9a-zA-Z\*\-\,\/]+)[ \t]+([1-9a-zA-Z\*\-\,\/]+)[ \t]+([1-9a-zA-Z\*\-\,\/]+)[ \t]+([1-9a-zA-Z\*\-\,\/]+)[ \t]*([a-zA-Z\-\_1-9]*)[ \t]+(.+)$')
+        schedule_re = re.compile(r'^([0-9a-zA-Z\*\-\,\/]+)[ \t]+([0-9a-zA-Z\*\-\,\/]+)[ \t]+([0-9a-zA-Z\*\-\,\/]+)[ \t]+([0-9a-zA-Z\*\-\,\/]+)[ \t]+([0-9a-zA-Z\*\-\,\/]+)[ \t]+([A-Za-z0-9\-\_]*)[ \t]*(.*)$')
 
         # work on each file that was found
         for cron in cron_paths:
@@ -185,36 +185,17 @@ def main():
                             job['data']['shell'] = shebang_re.search(line).group(2)
 
                         # Capture cron schedules
-                        # schedule_line = line.split()
-                        # if len(schedule_line) > 5:
-                        # # and shebang_re.search(line) is None and variable_re.search(line) is None and comment_re.search(line) is None:
-                        #     # sched['minute'] = schedule_re.search(line).group(1)
-                        #     # sched['hour'] = schedule_re.search(line).group(2)
-                        #     # sched['day_of_month'] = schedule_re.search(line).group(3)
-                        #     # sched['month'] = schedule_re.search(line).group(4)
-                        #     # sched['day_of_week'] = schedule_re.search(line).group(5)
-                        #     # # optional user field in some implementations
-                        #     # sched['user'] = schedule_re.search(line).group(6)
-                        #     # sched['command'] = schedule_re.search(line).group(7)
-                        #     sched['minute'] = schedule_line[0]
-                        #     sched['hour']
-                        #     sched['day_of_month']
-                        #     sched['month']
-                        #     sched['day_of_week']
-                        #     if len(schedule_line) > 5:
-                        #         sched['user'] = schedule_line[5]
-                        #         command = schedule_line[6]
-                        #         for i in schedule_line[7:]:
-                        #             command += " " + i
-                        #         sched['command'] = command
-                        #     else:
-                        #         command = schedule_line[5]
-                        #         for i in schedule_line[6:]:
-                        #             command += " " + i
-                        #         sched['command'] = command
-                        #     job['data']['schedules'].append(sched)
-                        # else:
-                        #     job['data']['schedules'].append('nope')
+                        if schedule_re.search(line) and line != '' and line != None:
+                            sched['minute'] = schedule_re.search(line).group(1)
+                            sched['hour'] = schedule_re.search(line).group(2)
+                            sched['day_of_month'] = schedule_re.search(line).group(3)
+                            sched['month'] = schedule_re.search(line).group(4)
+                            sched['day_of_week'] = schedule_re.search(line).group(5)
+                            # optional user field in some implementations
+                            if schedule_re.search(line).group(6):
+                                sched['user'] = schedule_re.search(line).group(6)
+                            sched['command'] = schedule_re.search(line).group(7)
+                            job['data']['schedules'].append(sched)
                 config.close()
                 # append each parsed file
                 cron_data.append(job)

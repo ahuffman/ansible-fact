@@ -21,6 +21,7 @@ The concept of this project is to perform Infrastructure-as-Code in Reverse (i.e
 | Module Name | Description | Test Playbook |
 | --- | --- | --- |
 | [scan_cron](library/scan_cron.py) | Collects all cron data from a system and converts to structured data | [scan_cron.yml](test/scan_cron.yml) |
+| [scan_processes](library/scan_processes.py) | Collects currently running processes from a system and converts to structured data | [scan_processes.yml](test/scan_processes.yml) |
 | [scan_sudoers](library/scan_sudoers.py) | Collects all sudoers configurations and converts to structured data | [scan_sudoers.yml](test/scan_sudoers.yml) |
 | [scan_user_group](library/scan_user_group.py) | Collects all local user and group data from `/etc/shadow`, `/etc/gshadow`, `/etc/passwd`, and `/etc/group`, and merges into structured data. | [scan_user_group.yml](test/scan_user_group.yml)
 

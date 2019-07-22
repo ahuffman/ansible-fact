@@ -22,7 +22,7 @@ output_ps_stdout_lines:
     required: False
 output_parsed_processes:
     description:
-        - Whether or not to output parsed data from the 'ps auxww'
+        - Whether or not to output parsed data from the 'ps auxww' command.
     default: True
     required: False
 author:
@@ -112,7 +112,7 @@ def main():
         return proc_stats
 
     def parse_process_data(procs):
-        re_ps = re.compile(r'^(?P<user>[a-zA-Z0-9\-\_]+)\s+(?P<pid>[0-9]+)\s+(?P<cpu>[0-9\.]+)\s+(?P<mem>[0-9\.]+)\s+(?P<vsz>[0-9]+)\s+(?P<rss>[0-9]+)\s+(?P<tty>[a-zA-Z0-9\?\/]+)\s+(?P<stat>[DIRSTtWXZ\<NLsl\+]+)\s+(?P<start>[A-Za-z0-9]+)\s+(?P<time>[0-9\:]+)\s+(?P<command>.*)$')
+        re_ps = re.compile(r'^(?P<user>[\w\+\-\_\$]+)\s+(?P<pid>[0-9]+)\s+(?P<cpu>[0-9\.]+)\s+(?P<mem>[0-9\.]+)\s+(?P<vsz>[0-9]+)\s+(?P<rss>[0-9]+)\s+(?P<tty>[a-zA-Z0-9\?\/]+)\s+(?P<stat>[DIRSTtWXZ\<NLsl\+]+)\s+(?P<start>[A-Za-z0-9\:]+)\s+(?P<time>[0-9\:]+)\s+(?P<command>.*)$')
         processes = list()
 
         for proc in procs:

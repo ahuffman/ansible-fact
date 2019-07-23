@@ -68,7 +68,6 @@ running_processes:
 
 from ansible.module_utils.basic import AnsibleModule
 import os, re, subprocess
-from os.path import isfile, isdir, join
 
 def main():
     module_args = dict(

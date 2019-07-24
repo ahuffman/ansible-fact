@@ -88,17 +88,46 @@ def main():
     os_family = os_facts['os_family']
 
     ## Enterprise Linux - based
-    # if os_family == "RedHat":
-    #     repos = get_yum_repodata()
+    if os_family == "RedHat":
+        repos = get_yum_repodata()
 
     ## Debian Linux - based
+    # if os_family == "Debian":
 
+    ## Suse
+    # if os_family == "Suse":
+
+    ## Archlinux
+
+    ## Mandrake
+
+    ## Solaris
+
+    ## Slackware
+
+    ## Altlinux
+
+    ## SGML
+
+    ## Gentoo
+
+    ## Alpine
+
+    ## AIX
+
+    ## HP-UX
+
+    ## Darwin
+
+    ## FreeBSD
+
+    ## ClearLinux
 
 
     # Build output
     repositories = dict()
     repositories['os_family'] = os_family
-    # repositories['repos'] = repos
+    repositories['repositories'] = repos
 
     result = {'ansible_facts': {'package_repositories': repositories }}
 

@@ -69,11 +69,7 @@ def main():
 
 
     # Do work
-    ## Get OS type
-    # if platform.system().lower().startswith('linux'):
-    #     os_type = list(platform.linux_distribution())[0].lower()
-    # else:
-    #     os_type = platform.system().lower()
+    ## Get OS family by recycling ansible distro code
     distro_facts = dist.DistributionFactCollector()
     os_facts = distro_facts.collect(module)
     os_family = os_facts['os_family']

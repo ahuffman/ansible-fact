@@ -1,0 +1,28 @@
+---
+- name: "Test scan_package_repositories - Python 2.7"
+  hosts: "localhost"
+  gather_facts: False
+  vars:
+    ansible_python_interpreter: "/usr/bin/python2.7"
+  tasks:
+    - name: "Scan package repositories"
+      scan_package_repositories:
+      become: True
+
+    - name: "Display collected package repository data"
+      debug:
+        var: "package_repositories"
+
+- name: "Test scan_package_repositories - Python 3.7"
+  hosts: "localhost"
+  gather_facts: False
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3.7"
+  tasks:
+    - name: "Scan package repositories"
+      scan_package_repositories:
+      become: True
+
+    - name: "Display collected package repository data"
+      debug:
+        var: "package_repositories"

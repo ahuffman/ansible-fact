@@ -15,16 +15,7 @@ version_added: "2.8"
 description:
     - "Collects the repository data from package repositories on a system."
     - "This module presents the package repository data and returns the configuration data as ansible_facts"
-output_ps_stdout_lines:
-    description:
-        - Whether or not to output the collected standard out lines from the 'ps auxww' command
-    default: False
-    required: False
-output_parsed_processes:
-    description:
-        - Whether or not to output parsed data from the 'ps auxww' command.
-    default: True
-    required: False
+
 author:
     - Andrew J. Huffman (@ahuffman)
 '''

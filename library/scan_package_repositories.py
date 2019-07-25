@@ -31,7 +31,12 @@ RETURN = '''
 from ansible.module_utils.basic import AnsibleModule
 import ansible.module_utils.facts.system.distribution as dist
 import os, re, platform
-from os.path import isfile, isdir, join
+from os.path import isfile, isdir, join, splitext
+try:
+    import configparser
+except:
+    pass
+    import ConfigParser as configparser
 
 def main():
     module_args = dict(
@@ -61,8 +66,36 @@ def main():
     params = module.params
 
     def get_yum_repodata():
-        yum_repos = list()
-        return yum_repos
+        yum_repo = dict()
+        yum_repo_files = list()
+
+        # collects list of .repo files in /etc/yum.repos.d
+        def get_repo_files():
+            yum_repo_paths = list()
+            yum_repos_d = "/etc/yum.repos.d"
+            # get only .repo files for parsing
+            yum_repo_paths += [join(yum_repos_d, filename) for filename in os.listdir(yum_repos_d) if isfile(join(yum_repos_d, filename)) and list(splitext(filename))[1] == ".repo"]
+            return yum_repo_paths
+
+        repo_files = get_repo_files()
+
+        for repo in repo_files:
+            yum_repo['path'] = repo
+            yum_repo['sections'] = list()
+
+            try:
+                repo_config = configparser.ConfigParser()
+                repo_config.read(repo)
+                repo_sections = repo_config.sections()
+                for s in repo_sections:
+                    section = {'section': s}
+                    section.update(dict(repo_config.items(s)))
+                    yum_repo['sections'].append(section)
+            except:
+                pass
+
+            yum_repo_files.append(yum_repo)
+        return yum_repo_files
 
 
     # def get_deb_repodata():
@@ -113,8 +146,8 @@ def main():
 
     # Build output
     repositories = dict()
-    repositories['os_family'] = os_family
-    repositories['repositories'] = repos
+    # repositories['os_family'] = os_family
+    repositories['repository_files'] = repos
 
     result = {'ansible_facts': {'package_repositories': repositories }}
 

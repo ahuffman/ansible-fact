@@ -66,20 +66,22 @@ def main():
     params = module.params
 
     def get_yum_repodata():
-        yum_repo = dict()
         yum_repo_files = list()
-
+        all = dict()
         # collects list of .repo files in /etc/yum.repos.d
         def get_repo_files():
-            yum_repo_paths = list()
+            # ensure we collect any repos and configs hiding in default yum config
+            yum_repo_paths = ['/etc/yum.conf']
             yum_repos_d = "/etc/yum.repos.d"
             # get only .repo files for parsing
             yum_repo_paths += [join(yum_repos_d, filename) for filename in os.listdir(yum_repos_d) if isfile(join(yum_repos_d, filename)) and list(splitext(filename))[1] == ".repo"]
+
             return yum_repo_paths
 
         repo_files = get_repo_files()
 
         for repo in repo_files:
+            yum_repo = dict()
             yum_repo['path'] = repo
             yum_repo['sections'] = list()
 

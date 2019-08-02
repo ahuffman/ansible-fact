@@ -47,23 +47,24 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-running_processes:
-    processes:
-      - command: /usr/lib/systemd/systemd --switched-root --system --deserialize 33
-        cpu_percentage: '0.0'
-        memory_percentage: '0.0'
-        pid: '1'
-        resident_size: '5036'
-        start: Jul08
-        stat: Ss
-        teletype: '?'
-        time: '3:32'
-        user: root
-      ...
-    ps_stdout_lines:
-      - root         1  0.0  0.0 171628  5056 ?        Ss   Jul08   3:32 /usr/lib/systemd/systemd --switched-root --system --deserialize 33
-      ...
-    total_running_processes: 359
+ansible_facts:
+  running_processes:
+      processes:
+        - command: /usr/lib/systemd/systemd --switched-root --system --deserialize 33
+          cpu_percentage: '0.0'
+          memory_percentage: '0.0'
+          pid: '1'
+          resident_size: '5036'
+          start: Jul08
+          stat: Ss
+          teletype: '?'
+          time: '3:32'
+          user: root
+          ...
+      ps_stdout_lines:
+        - root         1  0.0  0.0 171628  5056 ?        Ss   Jul08   3:32 /usr/lib/systemd/systemd --switched-root --system --deserialize 33
+          ...
+      total_running_processes: 359
 '''
 
 from ansible.module_utils.basic import AnsibleModule

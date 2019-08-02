@@ -50,130 +50,131 @@ EXAMPLES = '''
 
 RETURN = '''
 # From a default Fedora configuration
-cron:
-  all_scanned_files:
-    - /etc/crontab
-    - /etc/cron.hourly/0anacron
-    - /etc/cron.weekly/98-zfs-fuse-scrub
-    - /var/spool/cron/root
-    - /etc/cron.d/0hourly
-    - /etc/cron.d/raid-check
-  allow:
-    path: /etc/cron.allow
-    users: []
-  deny:
-    path: /etc/cron.deny
-    users: []
-  files:
-    - configuration:
-        - SHELL=/bin/bash
-        - PATH=/sbin:/bin:/usr/sbin:/usr/bin
-        - MAILTO=root
-      data:
-        schedules: []
-        variables:
-          - name: SHELL
-            value: /bin/bash
-          - name: PATH
-            value: /sbin:/bin:/usr/sbin:/usr/bin
-          - name: MAILTO
-            value: root
-      path: /etc/crontab
-    - configuration:
-        - '#!/usr/bin/sh'
-        - if test -r /var/spool/anacron/cron.daily; then
-        - '    day=`cat /var/spool/anacron/cron.daily`'
-        - fi
-        - if [ `date +%Y%m%d` = "$day" ]; then
-        - '    exit 0'
-        - fi
-        - online=1
-        - for psupply in AC ADP0 ; do
-        - '    sysfile="/sys/class/power_supply/$psupply/online"'
-        - '    if [ -f $sysfile ] ; then'
-        - '        if [ `cat $sysfile 2>/dev/null`x = 1x ]; then'
-        - '            online=1'
-        - '            break'
-        - '        else'
-        - '            online=0'
-        - '        fi'
-        - '    fi'
-        - done
-        - if [ $online = 0 ]; then
-        - '    exit 0'
-        - fi
-        - /usr/sbin/anacron -s
-      data:
-        schedules: []
-        shell: /usr/bin/sh
-        variables:
-          - name: online
-            value: '1'
-      path: /etc/cron.hourly/0anacron
-    - configuration:
-        - '#!/usr/bin/bash'
-        - '[ -f /etc/sysconfig/zfs-fuse ] || exit 0'
-        - . /etc/sysconfig/zfs-fuse
-        - '[ "$ZFS_WEEKLY_SCRUB" != "yes" ] && exit 0'
-        - zpool=/usr/sbin/zpool
-        - pools=`$zpool list -H | cut -f1`
-        - if [ "$pools" != "" ] ; then
-        - '    echo Found these pools: $pools'
-        - '    for pool in $pools; do'
-        - '    echo "Starting scrub of pool $pool"'
-        - '    $zpool scrub $pool'
-        - '    done'
-        - '    echo "ZFS Fuse automatic scrub start done.  Use ''$zpool status'' to see progress."'
-        - fi
-      data:
-        schedules: []
-        shell: /usr/bin/bash
-        variables:
-          - name: zpool
-            value: /usr/sbin/zpool
-          - name: pools
-            value: '`$zpool list -H | cut -f1`'
-      path: /etc/cron.weekly/98-zfs-fuse-scrub
-    - configuration: []
-      data:
-        schedules: []
-        variables: []
-      path: /var/spool/cron/root
-    - configuration:
-        - SHELL=/bin/bash
-        - PATH=/sbin:/bin:/usr/sbin:/usr/bin
-        - MAILTO=root
-        - 01 * * * * root run-parts /etc/cron.hourly
-      data:
-        schedules:
-          - command: run-parts /etc/cron.hourly
-            day_of_month: '*'
-            day_of_week: '*'
-            hour: '*'
-            minute: '01'
-            month: '*'
-            user: root
-        variables:
-          - name: SHELL
-            value: /bin/bash
-          - name: PATH
-            value: /sbin:/bin:/usr/sbin:/usr/bin
-          - name: MAILTO
-            value: root
-      path: /etc/cron.d/0hourly
-    - configuration:
-        - 0 1 * * Sun root /usr/sbin/raid-check
-      data:
-        schedules:
-          - command: /usr/sbin/raid-check
-            day_of_month: '*'
-            day_of_week: Sun
-            hour: '1'
-            minute: '0'
-            month: '*'
-            user: root
-        variables: []
-      path: /etc/cron.d/raid-check
+ansible_facts:
+  cron:
+    all_scanned_files:
+      - /etc/crontab
+      - /etc/cron.hourly/0anacron
+      - /etc/cron.weekly/98-zfs-fuse-scrub
+      - /var/spool/cron/root
+      - /etc/cron.d/0hourly
+      - /etc/cron.d/raid-check
+    allow:
+      path: /etc/cron.allow
+      users: []
+    deny:
+      path: /etc/cron.deny
+      users: []
+    files:
+      - configuration:
+          - SHELL=/bin/bash
+          - PATH=/sbin:/bin:/usr/sbin:/usr/bin
+          - MAILTO=root
+        data:
+          schedules: []
+          variables:
+            - name: SHELL
+              value: /bin/bash
+            - name: PATH
+              value: /sbin:/bin:/usr/sbin:/usr/bin
+            - name: MAILTO
+              value: root
+        path: /etc/crontab
+      - configuration:
+          - '#!/usr/bin/sh'
+          - if test -r /var/spool/anacron/cron.daily; then
+          - '    day=`cat /var/spool/anacron/cron.daily`'
+          - fi
+          - if [ `date +%Y%m%d` = "$day" ]; then
+          - '    exit 0'
+          - fi
+          - online=1
+          - for psupply in AC ADP0 ; do
+          - '    sysfile="/sys/class/power_supply/$psupply/online"'
+          - '    if [ -f $sysfile ] ; then'
+          - '        if [ `cat $sysfile 2>/dev/null`x = 1x ]; then'
+          - '            online=1'
+          - '            break'
+          - '        else'
+          - '            online=0'
+          - '        fi'
+          - '    fi'
+          - done
+          - if [ $online = 0 ]; then
+          - '    exit 0'
+          - fi
+          - /usr/sbin/anacron -s
+        data:
+          schedules: []
+          shell: /usr/bin/sh
+          variables:
+            - name: online
+              value: '1'
+        path: /etc/cron.hourly/0anacron
+      - configuration:
+          - '#!/usr/bin/bash'
+          - '[ -f /etc/sysconfig/zfs-fuse ] || exit 0'
+          - . /etc/sysconfig/zfs-fuse
+          - '[ "$ZFS_WEEKLY_SCRUB" != "yes" ] && exit 0'
+          - zpool=/usr/sbin/zpool
+          - pools=`$zpool list -H | cut -f1`
+          - if [ "$pools" != "" ] ; then
+          - '    echo Found these pools: $pools'
+          - '    for pool in $pools; do'
+          - '    echo "Starting scrub of pool $pool"'
+          - '    $zpool scrub $pool'
+          - '    done'
+        - '    echo "ZFS Fuse automatic scrub start done.  Use ''$zpool   status'' to see progress."'
+          - fi
+        data:
+          schedules: []
+          shell: /usr/bin/bash
+          variables:
+            - name: zpool
+              value: /usr/sbin/zpool
+            - name: pools
+              value: '`$zpool list -H | cut -f1`'
+        path: /etc/cron.weekly/98-zfs-fuse-scrub
+      - configuration: []
+        data:
+          schedules: []
+          variables: []
+        path: /var/spool/cron/root
+      - configuration:
+          - SHELL=/bin/bash
+          - PATH=/sbin:/bin:/usr/sbin:/usr/bin
+          - MAILTO=root
+          - 01 * * * * root run-parts /etc/cron.hourly
+        data:
+          schedules:
+            - command: run-parts /etc/cron.hourly
+              day_of_month: '*'
+              day_of_week: '*'
+              hour: '*'
+              minute: '01'
+              month: '*'
+              user: root
+          variables:
+            - name: SHELL
+              value: /bin/bash
+            - name: PATH
+              value: /sbin:/bin:/usr/sbin:/usr/bin
+            - name: MAILTO
+              value: root
+        path: /etc/cron.d/0hourly
+      - configuration:
+          - 0 1 * * Sun root /usr/sbin/raid-check
+        data:
+          schedules:
+            - command: /usr/sbin/raid-check
+              day_of_month: '*'
+              day_of_week: Sun
+              hour: '1'
+              minute: '0'
+              month: '*'
+              user: root
+          variables: []
+        path: /etc/cron.d/raid-check
 '''
 
 from ansible.module_utils.basic import AnsibleModule

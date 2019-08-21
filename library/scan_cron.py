@@ -157,7 +157,7 @@ def get_cron_files(cron_files):
           'path': a_file,
           'user': user,
           'group': group,
-          'permissions': oct(stat.S_IMODE(file_stats.st_mode)).replace('o', ''),
+          'permissions': (oct( stat.S_IMODE(file_stats.st_mode) )[2:]).zfill(4)
         })
 
     return return_files

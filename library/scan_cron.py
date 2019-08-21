@@ -287,19 +287,19 @@ def main():
     try:
         cron = { 'files': get_cron_files(cron_files), }
     except Exception as e:
-        module.fail_json("Failed to search for cron files: {}".format(e))
+        module.fail_json(msg="Failed to search for cron files: {}".format(e))
 
     if len(cron_files) == 0:
         # If we are using the default files we can also go after the allow and deny files
         try:
             cron['allow'] = get_cron_allow_or_deny('allow')
         except Exception as e:
-            module.fail_json("Failed to load cron.allow file: {}".format(e))
+            module.fail_json(msg="Failed to load cron.allow file: {}".format(e))
 
         try:
             cron['deny'] = get_cron_allow_or_deny('deny')
         except Exception as e:
-            module.fail_json("Failed to load cron.deny file: {}".format(e))
+            module.fail_json(msg="Failed to load cron.deny file: {}".format(e))
 
     try:
         cron['all_scanned_files'] = get_cron_data(cron['files'], strip_comments, parse_configs)

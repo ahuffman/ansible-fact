@@ -36,10 +36,29 @@
           - read_failure is failed
           - "'Permission denied' in read_failure.msg"
 
+    - name: "Set the permissions to 644 for assertion"
+      file:
+        path: crontabs/var/spool/cron/root/test_1
+        mode: "0644"
+        state: touch
+
     - name: "Load the test_1 crontab"
       scan_cron:
         cron_files:
           - crontabs/var/spool/cron/root/test_1
+
+    - debug:
+        msg:
+          - "Here are the assertion values we are going to look at"
+          - "{{ cron.files | length() }} == 1"
+          - "{{ cron.files[0]['path'] }} == 'crontabs/var/spool/cron/root/test_1'"
+          - "{{ cron.files[0]['permissions'] }} == '0644'"
+          - "'user' in {{ cron.files[0] }}"
+          - "'group' in {{ cron.files[0] }}"
+          - "{{ cron.all_scanned_files | length() }} == 1"
+          - "{{ cron.all_scanned_files[0]['configuration'] | length() }} == 57"
+          - "{{ cron.all_scanned_files[0]['data']['schedules'] | length() }} == 19"
+          - "'timeperiod' not in {{ cron.all_scanned_files[0]['data']['schedules'][0] }}"
 
     - name: Validate that all cronjobs were loaded
       assert:

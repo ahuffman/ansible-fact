@@ -141,6 +141,8 @@ def get_cron_files(cron_files):
             if isfile(a_file):
                 cron_paths.append(a_file)
 
+    octal_re = re.compile('^0o{0,1}')
+
     return_files = []
     for a_file in cron_paths:
         file_stats = os_stat(a_file)
@@ -157,7 +159,7 @@ def get_cron_files(cron_files):
           'path': a_file,
           'user': user,
           'group': group,
-          'permissions': (oct( stat.S_IMODE(file_stats.st_mode) )[2:]).zfill(4)
+          'permissions': octal_re.sub('', oct( stat.S_IMODE(file_stats.st_mode) )).zfill(4),
         })
 
     return return_files

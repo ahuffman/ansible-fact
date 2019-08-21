@@ -3,62 +3,196 @@
   hosts: "localhost"
   gather_facts: False
   vars:
-    ansible_python_interpreter: "/usr/bin/python2.7"
+    cron_files:
+      - crontabs/etc/cron.deny
+      - crontabs/etc/cron.daily/rhsmd.rhel8
+      - crontabs/etc/cron.daily/logrotate.rhel8
+      - crontabs/etc/cron.hourly/0anacron.rhel8
+      - crontabs/etc/cron.d/raid-check.rhel8
+      - crontabs/etc/cron.d/0hourly.rhel8
+      - crontabs/var/spool/cron/root/test_1
+  become: False
+
   tasks:
-    - name: "Scan Cron - all data"
+    - name: "Load the test_1 crontab"
       scan_cron:
-      become: True
+        cron_files:
+          - crontabs/var/spool/cron/root/test_1
 
-    - name: "Display all cron data"
-      debug:
-        var: "cron"
+    - name: Validate that all cronjobs were loaded
+      assert:
+        that:
+          - cron.files | length() == 1
+          - cron.files[0]['path'] == "crontabs/var/spool/cron/root/test_1"
+          - cron.files[0]['permissions'] == "0644"
+          - "'user' in cron.files[0]"
+          - "'group' in cron.files[0]"
+          - cron.all_scanned_files | length() == 1
+          - cron.all_scanned_files[0]['configuration'] | length() == 57
+          - cron.all_scanned_files[0]['data']['schedules'] | length() == 19
+          - "'timeperiod' not in cron.all_scanned_files[0]['data']['schedules'][0]"
+        msg: "{{ cron }}"
+#                "data": {
+#                    "schedules": [
+#                        {
+#                            "command": "/bin/sh backup.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "*", 
+#                            "hour": "2", 
+#                            "minute": "0", 
+#                            "month": "*"
+#                        }, 
+#                        {
+#                            "command": "/scripts/script.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "*", 
+#                            "hour": "5,17", 
+#                            "minute": "0", 
+#                            "month": "*"
+#                        }, 
+#                        {
+#                            "command": "/scripts/script.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "*", 
+#                            "hour": "*", 
+#                            "minute": "*", 
+#                            "month": "*"
+#                        }, 
+#                        {
+#                            "command": "/scripts/script.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "sun", 
+#                            "hour": "17", 
+#                            "minute": "0", 
+#                            "month": "*"
+#                        }, 
+#                        {
+#                            "command": "/scripts/monitor.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "*", 
+#                            "hour": "*", 
+#                            "minute": "*/10", 
+#                            "month": "*"
+#                        }, 
+#                        {
+#                            "command": "/script/script.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "*", 
+#                            "hour": "*", 
+#                            "minute": "*", 
+#                            "month": "jan,may,aug"
+#                        }, 
+#                        {
+#                            "command": "/script/script.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "sun,fri", 
+#                            "hour": "17", 
+#                            "minute": "0", 
+#                            "month": "*"
+#                        }, 
+#                        {
+#                            "command": "[ $(date +%d) -le 07 ] && /script/script.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "sun", 
+#                            "hour": "2", 
+#                            "minute": "0", 
+#                            "month": "*"
+#                        }, 
+#                        {
+#                            "command": "/scripts/script.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "*", 
+#                            "hour": "*/4", 
+#                            "minute": "0", 
+#                            "month": "*"
+#                        }, 
+#                        {
+#                            "command": "/scripts/script.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "sun,mon", 
+#                            "hour": "4,17", 
+#                            "minute": "0", 
+#                            "month": "*"
+#                        }, 
+#                        {
+#                            "command": "/scripts/script.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "*", 
+#                            "hour": "*", 
+#                            "minute": "*", 
+#                            "month": "*"
+#                        }, 
+#                        {
+#                            "command": "30; /scripts/script.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "*", 
+#                            "hour": "*", 
+#                            "minute": "*", 
+#                            "month": "*", 
+#                            "user": "sleep"
+#                        }, 
+#                        {
+#                            "command": "/scripts/script.sh; /scripts/scrit2.sh", 
+#                            "day_of_month": "*", 
+#                            "day_of_week": "*", 
+#                            "hour": "*", 
+#                            "minute": "*", 
+#                            "month": "*"
+#                        }, 
+#                        {
+#                            "command": "/scripts/script.sh", 
+#                            "timeframe": "@yearly"
+#                        }, 
+#                        {
+#                            "command": "/scripts/script.sh", 
+#                            "timeframe": "@monthly"
+#                        }, 
+#                        {
+#                            "command": "/bin/script.sh", 
+#                            "timeframe": "@weekly"
+#                        }, 
+#                        {
+#                            "command": "/scripts/script.sh", 
+#                            "timeframe": "@daily"
+#                        }, 
+#                        {
+#                            "command": "/scripts/script.sh", 
+#                            "timeframe": "@hourly"
+#                        }, 
+#                        {
+#                            "command": "/scripts/script.sh", 
+#                            "timeframe": "@reboot", 
+#                            "user": "bob"
+#                        }
+#                    ]
+#                }, 
+#                "path": "crontabs/var/spool/cron/root/test_1"
+#            }
+#        ], 
+ 
 
-    - name: "Scan Cron - no parsed data"
-      scan_cron:
-        output_parsed_configs: False
-      become: True
-
-    - name: "Display only cron raw configs"
-      debug:
-        var: "cron"
-
-    - name: "Scan Cron - no raw configuration data"
-      scan_cron:
-        output_raw_configs: False
-      become: True
-
-    - name: "Display only cron parsed data"
-      debug:
-        var: "cron"
-
-- name: "Test scan_cron - Python 3.7"
-  hosts: "localhost"
-  gather_facts: False
-  vars:
-    ansible_python_interpreter: "/usr/bin/python3.7"
-  tasks:
-    - name: "Scan Cron - all data"
-      scan_cron:
-      become: True
-
-    - name: "Display all cron data"
-      debug:
-        var: "cron"
-
-    - name: "Scan Cron - no parsed data"
-      scan_cron:
-        output_parsed_configs: False
-      become: True
-
-    - name: "Display only cron raw configs"
-      debug:
-        var: "cron"
-
-    - name: "Scan Cron - no raw configuration data"
-      scan_cron:
-        output_raw_configs: False
-      become: True
-
-    - name: "Display only cron parsed data"
-      debug:
-        var: "cron"
+#    - name: "Scan Cron - all data"
+#      scan_cron:
+#        cron_files: "{{ cron_files }}"
+#
+#    - name: "Display all cron data"
+#      debug:
+#        var: "cron"
+#
+#    - name: "Scan Cron - no parsed data"
+#      scan_cron:
+#        output_parsed_configs: False
+#        cron_files: "{{ cron_files }}"
+#
+#    - name: "Display only cron raw configs"
+#      debug:
+#        var: "cron"
+#
+#    - name: "Scan Cron - no raw configuration data"
+#      scan_cron:
+#        output_raw_configs: False
+#        cron_files: "{{ cron_files }}"
+#
+#    - name: "Display only cron parsed data"
+#      debug:
+#        var: "cron"

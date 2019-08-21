@@ -12,8 +12,30 @@
       - crontabs/etc/cron.d/0hourly.rhel8
       - crontabs/var/spool/cron/root/test_1
   become: False
-
+  vars:
+    force_handlers: True
+    no_permissions_file: crontabs/no_permissions
+  
   tasks:
+    - name: "Create a sample file with no permissions"
+      file:
+        path: "{{ no_permissions_file }}"
+        mode: "000"
+        state: touch
+      notify: cleanup_no_permission_file
+
+    - name: "Attempt to load a file with no permissions"
+      scan_cron:
+        cron_files:
+          - "{{ no_permissions_file }}"
+      ignore_errors: True
+      register: read_failure
+
+    - assert:
+        that:
+          - read_failure is failed
+          - "'Permission denied' in read_failure.msg"
+
     - name: "Load the test_1 crontab"
       scan_cron:
         cron_files:
@@ -31,7 +53,6 @@
           - cron.all_scanned_files[0]['configuration'] | length() == 57
           - cron.all_scanned_files[0]['data']['schedules'] | length() == 19
           - "'timeperiod' not in cron.all_scanned_files[0]['data']['schedules'][0]"
-        msg: "{{ cron }}"
 #                "data": {
 #                    "schedules": [
 #                        {
@@ -196,3 +217,9 @@
 #    - name: "Display only cron parsed data"
 #      debug:
 #        var: "cron"
+
+  handlers:
+    - name: cleanup_no_permission_file
+      # This has to be a command to actually remove this
+      command: "rm -f {{ no_permissions_file }}"
+      warn: false

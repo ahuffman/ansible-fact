@@ -70,7 +70,21 @@ local_groups:
     description: "List of parsed local group data.  This is a merged list of data from /etc/group and /etc/gshadow by default."
     returned: "success"
     type: "list"
-    sample: "[{'administrators': [], 'encrypted_password': '', 'gid': '0', 'group': 'root', 'gshadow': True, 'members': []}]"
+    sample:
+      ansible_facts:
+        local_groups:
+          - administrators: []
+            encrypted_password: ''
+            gid: '0'
+            group: root
+            gshadow: true
+            members: []
+          - administrators: []
+            encrypted_password: ''
+            gid: '1'
+            group: bin
+            gshadow: true
+            members: []
 '''
 
 from ansible.module_utils.basic import AnsibleModule

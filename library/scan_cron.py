@@ -14,41 +14,45 @@ short_description: Collects cron job facts
 version_added: "2.8"
 description:
     - "Collects cron job facts from a system."
-    - "The module can display both parsed and raw cron configurations which is useful when some cron jobs are scripts and others are true schedules."
-    - "The display of either raw configurations or parsed configurations can be limited via the module parameters."
+    - "The module can display both parsed and effective cron configurations which is useful when some cron jobs are scripts and others are true schedules."
+    - "The display of either effective configurations or parsed configurations can be limited via the module parameters."
 options:
-    output_raw_configs:
+    strip_comments:
         description:
-            - Whether or not to output raw configuration lines (excluding comments) from the scanned cron files
+            - Ignore comment lines from configuration
+        default: False
+        required: False
+    parse_configs:
+        description:
+            - Parse the configuration files
+            - Get #! lines from scripts
+            - Get schedules from schedule based files
         default: True
         required: False
-    output_parsed_configs:
+    cron_files:
         description:
-            - Whether or not to output parsed data from the scanned cron files
-        default: True
+            - A list of files to scan. If not set the scanner will search for standard files.
+        default: []
         required: False
 author:
     - Andrew J. Huffman (@ahuffman)
 '''
 
 EXAMPLES = '''
-# Collect all cron data (defaults)
 - name: "Collect all cron data"
   scan_cron:
 
-# Collect only raw configurations (minus comments)
-- name: "Collect raw cron configs"
+- name: "Strip comments and empty lines in configuration"
   scan_cron:
-    output_parsed_configs: False
+    strip_comments: False
 
-# Collect only parsed configuration data
-#     This is only useful if you have no scripting logic in the cron files (i.e. if's, do untils, etc.)
-- name: "Collect parsed cron data"
+- name: "Dont parse configuration"
   scan_cron:
-    output_raw_configs: False
+    parse_configs: False
 '''
 
 RETURN = '''
+<<<<<<< HEAD
 # From a default Fedora configuration
 ansible_facts:
   cron:
@@ -175,73 +179,79 @@ ansible_facts:
               user: root
           variables: []
         path: /etc/cron.d/raid-check
+=======
+all_scanned_files:
+  - configuration: The file scanned as a list
+    data:
+      schedules:
+        - day_of_month: The day of the month of the schedule
+          day_of_week: The day of the week of the schedule
+          hour: The hour of the schedule
+          minute: The minute of the schedule
+          month: The month of the schedule
+          timeframe: If specified as @yearly/hourly/reboot/monthly
+          command: The command to be run
+      variables:
+        - name: name of the variable
+          value: The value of the variable
+    path: The file that this information was parsed from
+allow:
+  path: The path to allow file
+  users: List of users in the allow file
+deny:
+  path: The path to the deny file
+  users: List of users in the deny file
+files:
+  - name: The file name scanned
+    user:
+    group:
+    permissions:
+>>>>>>> 024987a0336a487de8fe690429a66c7cd3712378
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-import os
 from os.path import isfile, isdir, join
+from os import walk, stat as os_stat
 import re
+import stat
+from pwd import getpwuid
+from grp import getgrgid
 
-def main():
-    module_args = dict(
-        output_raw_configs=dict(
-            type='bool',
-            default=True,
-            required=False
-        ),
-        output_parsed_configs=dict(
-            type='bool',
-            default=True,
-            required=False
-        )
-    )
+def get_cron_allow_or_deny(allow_or_deny):
+    file_name = "/etc/cron.{}".format(allow_or_deny)
+    results = None 
+    # Allow this to raise an exception
+    if isfile(file_name):
+        results = {
+          'path': file_name,
+          'users': []
+        }
+        with open(file_name, 'r') as f:
+            for line in f:
+                results['users'].append(user)
+    return results
 
-    result = dict(
-        changed=False,
-        original_message='',
-        message=''
-    )
+def get_files(path, **kwargs):
+    files = []
 
-    module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True
-    )
+    if isdir(path):
+        # r=root, d=directories, f = files
+        for r, d, f in walk(path):
+            for a_file in f:
+                if 'extension' not in kwargs or a_file.endswith(kwargs['extension']):
+                    files.append(join(r, a_file))
 
-    params = module.params
+    return files
 
-    def get_cron_allow():
-        allow = dict()
-        allow['path'] = '/etc/cron.allow'
-        allow['users'] = list()
-        try:
-            cron_allow = open('/etc/cron.allow', 'r')
-            for line in cron_allow:
-                user = line.replace('\n', '')
-                allow['users'].append(user)
-            cron_allow.close()
-        except:
-            pass
-        return allow
 
-    def get_cron_deny():
-        deny = dict()
-        deny['path'] = '/etc/cron.deny'
-        deny['users'] = list()
-        try:
-            cron_deny = open('/etc/cron.deny', 'r')
-            for line in cron_deny:
-                user = line.replace('\n', '')
-                deny['users'].append(user)
-            cron_deny.close()
-        except:
-            pass
-        return deny
+def get_cron_files(cron_files):
+    cron_paths = []
 
-    def get_cron_files():
+    if len(cron_files) == 0:
         # standard cron locations for cron file discovery
-        cron_paths = [
-            "/etc/crontab"
-        ]
+        if isfile("/etc/crontab"):
+            cron_paths.append("/etc/crontab")
+
         cron_dirs = [
             "/etc/cron.hourly",
             "/etc/cron.daily",
@@ -252,105 +262,180 @@ def main():
         ]
 
         # Look for files in cron directories and append to cron_paths
-        for dir in cron_dirs:
-            try:
-                cron_paths += [join(dir, filename) for filename in os.listdir(dir) if isfile(join(dir, filename))]
-                # keep digging
-                cron_dirs += [join(dir, filename) for filename in os.listdir(dir) if isdir(join(dir, filename))]
-            except:
-                pass
-        return cron_paths
+        for a_dir in cron_dirs:
+            cron_files.extend( get_files(a_dir) )
 
-    def get_cron_data(cron_paths):
-        # Output data
-        cron_data = list()
-        # Regex for parsing data
-        variable_re = re.compile(r'^([a-zA-Z0-9_-]*)[ \t]*=[ \t]*(.*)$')
-        comment_re = re.compile(r'^#+')
-        shebang_re = re.compile(r'^(#!){1}(.*)$')
-        schedule_re = re.compile(r'^([0-9a-zA-Z\*\-\,\/]+)[ \t]+([0-9a-zA-Z\*\-\,\/]+)[ \t]+([0-9a-zA-Z\*\-\,\/]+)[ \t]+([0-9a-zA-Z\*\-\,\/]+)[ \t]+([0-9a-zA-Z\*\-\,\/]+)[ \t]+([A-Za-z0-9\-\_]*)[ \t]*(.*)$')
+    else:
+        for a_file in cron_files:
+            if isfile(a_file):
+                cron_paths.append(a_file)
 
-        # work on each file that was found
-        for cron in cron_paths:
-            job = dict()
-            job['path'] = cron
+    return_files = []
+    for a_file in cron_paths:
+        file_stats = os_stat(a_file)
+        try:
+            user = getpwuid( file_stats.st_uid ).pw_name
+        except KeyError as e:
+            user = file_stats.st_uid
+        try:
+            group = getgrgid( file_stats.st_gid ).gr_name
+        except KeyError as e:
+            group = file_stats.st_gid
 
-            if params['output_raw_configs']:
-                job['configuration'] = list()
+        return_files.append({
+          'path': a_file,
+          'user': user,
+          'group': group,
+          'permissions': oct(stat.S_IMODE(file_stats.st_mode)),
+        })
 
-            if params['output_parsed_configs']:
-                job['data'] = dict()
-                job['data']['variables'] = list()
-                job['data']['schedules'] = list()
-                job['data']['shell'] = ''
+    return return_files
 
-            # make sure we have permission to open the files
-            try:
-                config = open(cron, 'r')
-                for l in config:
-                    line = l.replace('\n', '').replace('\t', '    ')
-                    # raw configuration output
-                    if params['output_raw_configs']:
-                        # Not a comment line
-                        if comment_re.search(line) is None and line != '' and line != None:
-                            job['configuration'].append(line)
 
-                        # Shebang line
-                        elif shebang_re.search(line) and line != '' and line != None:
-                            job['configuration'].append(line)
+def get_cron_data(cron_paths, strip_comments, parse_configs):
+    # Output data
+    cron_data = list()
+    # Regex for parsing data
+    variable_re = re.compile(r'^([a-zA-Z0-9_-]*)[ \t]*=[ \t]*(.*)$')
+    comment_re = re.compile(r'^#+')
+    shebang_re = re.compile(r'^(#!){1}(.*)$')
+    #                            .--- minute (0 - 59)
+    #                            |                          .--- hour (0 - 23)
+    #                            |                          |                          .--- day of month (1 - 31)
+    #                            |                          |                          |                          .--- month (1 - 12) OR jan,feb,mar,apr ...
+    #                            |                          |                          |                          |                          .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+    #                            |                          |                          |                          |                          |                          .---Optional user
+    #                            |                          |                          |                          |                          |                          |                      .command
+    schedule_re = re.compile(r'^([0-9a-zA-Z\*\-\,\/]+)[\s]+([0-9a-zA-Z\*\-\,\/]+)[\s]+([0-9a-zA-Z\*\-\,\/]+)[\s]+([0-9a-zA-Z\*\-\,\/]+)[\s]+([0-9a-zA-Z\*\-\,\/]+)[\s]+([A-Za-z0-9\-\_]*)[\s]*(.*)$')
+    #                                .--- Yearly/monthly/weekly
+    #                                |                . Optional user
+    #                                |                |                      .command
+    alt_schedule_re = re.compile(r'^(@[a-zA-Z]+)[\s]+([A-Za-z0-9\-\_]*)[\s]*(.*)$')
 
-                    # parsed data output
-                    if params['output_parsed_configs']:
-                        variable = dict()
-                        sched = dict()
+    # work on each file that was found
+    for cron_file in cron_paths:
+        job = {
+            'path': cron_file['path'],
+            'configuration': [],
+        }
 
-                        # Capture script variables
-                        if variable_re.search(line) and line != '' and line != None:
-                            variable['name'] = variable_re.search(line).group(1)
-                            variable['value'] = variable_re.search(line).group(2)
-                            job['data']['variables'].append(variable)
+        with open(cron_file['path'], 'r') as config:
+            first_line = True
+            for line in config:
+                # Never strip a shebang line
+                if first_line and shebang_re.match(line):
+                    job['configuration'].append(line)
+                    first_line = False
+                elif strip_comments:
+                    line = re.sub('#.*', '', line)
+                    if line != '':
+                        job['configuration'].append(line)
+                else:
+                    job['configuration'].append(line)
 
-                        # Capture script shell type
-                        if shebang_re.search(line) and line != '' and line != None:
-                            job['data']['shell'] = shebang_re.search(line).group(2)
 
-                        # Capture cron schedules:
-                        ##  don't try if a shell is set on the file, because it's a script at that point
-                        if schedule_re.search(line) and line != '' and line != None and job['data']['shell'] == '':
-                            sched['minute'] = schedule_re.search(line).group(1)
-                            sched['hour'] = schedule_re.search(line).group(2)
-                            sched['day_of_month'] = schedule_re.search(line).group(3)
-                            sched['month'] = schedule_re.search(line).group(4)
-                            sched['day_of_week'] = schedule_re.search(line).group(5)
-                            # optional user field in some implementations
-                            if schedule_re.search(line).group(6):
-                                sched['user'] = schedule_re.search(line).group(6)
-                            sched['command'] = schedule_re.search(line).group(7)
-                            job['data']['schedules'].append(sched)
-                config.close()
+        if parse_configs and len(job['configuration']) > 0:
+            job_info = {}
 
-            except:
-                pass
+            # Get the shebang line
+            shebang_results = shebang_re.search(job['configuration'][0])
+            if shebang_results != None:
+                job_info['shell'] = shebang_results.group(2)
 
-            # append each parsed file
-            cron_data.append(job)
-        return cron_data
+            ##  don't try if a shell is set on the file, because it's a script at that point
+            if 'shell' not in job_info:
+                for line in job['configuration']:
 
-    # Do work
-    cron_allow = get_cron_allow()
-    cron_deny = get_cron_deny()
-    cron_paths = get_cron_files()
-    cron_data = get_cron_data(cron_paths)
+                    # Capture cron schedules:
+                    regular_schedule_results = schedule_re.search(line)
+                    if regular_schedule_results != None:
+                        if 'schedules' not in job_info:
+                            job_info['schedules'] = []
+                        job_info['schedules'].append({
+                            'minute': regular_schedule_results.group(1),
+                            'hour': regular_schedule_results.group(2),
+                            'day_of_month': regular_schedule_results.group(3),
+                            'month': regular_schedule_results.group(4),
+                            'day_of_week': regular_schedule_results.group(5),
+                            'command': regular_schedule_results.group(7),
+                        })
+                        # optional user field in some implementations
+                        if regular_schedule_results.group(6):
+                            job_info['schedules'][-1]['user'] = regular_schedule_results.group(6)
 
-    # Build output
-    cron = dict()
-    cron['allow'] = cron_allow
-    cron['deny'] = cron_deny
-    cron['all_scanned_files'] = cron_paths
-    cron['files'] = cron_data
-    result = {'ansible_facts': {'cron': cron}}
+                    else:
+                        # Capture alt cron format
+                        alt_schedule_results = alt_schedule_re.search(line)
+                        if alt_schedule_results != None:
+                            if 'schedules' not in job_info:
+                                job_info['schedules'] = []
+                            job_info['schedules'].append({
+                                'timeframe': alt_schedule_results.group(1),
+                                'command': alt_schedule_results.group(3),
+                            })
+                            if alt_schedule_results.group(2):
+                                job_info['schedules'][-1]['user'] = alt_schedule_results.group(2)
 
-    module.exit_json(**result)
+                        else:
+                            # Capture script variables
+                            variable_results = variable_re.search(line)
+                            if variable_results != None:
+                                if 'variables' not in job_info:
+                                    job_info['variables'] = []
+                                job_info['variables'].append({
+                                    'name': variable_results.group(1),
+                                    'value': variable_results.group(2),
+                                })
+
+            job['data'] = job_info
+
+        # append each parsed file
+        cron_data.append(job)
+    return cron_data
+
+def main():
+    module = AnsibleModule(
+        argument_spec= dict(
+            cron_files=dict(type='list', default=[], required=False),
+            strip_comments=dict(type='bool', default=False, required=False),
+            parse_configs=dict(type='bool', default=True, required=False),
+        ),
+        supports_check_mode=True
+    )
+
+    result = dict(
+        changed=False,
+        original_message='',
+        message=''
+    )
+
+    cron_files = module.params.get('cron_files')
+    strip_comments = module.params.get('strip_comments')
+    parse_configs = module.params.get('parse_configs')
+    
+    try:
+        cron = { 'files': get_cron_files(cron_files), }
+    except Exception as e:
+        module.fail_json("Failed to search for cron files: {}".format(e))
+
+    if len(cron_files) == 0:
+        # If we are using the default files we can also go after the allow and deny files
+        try:
+            cron['allow'] = get_cron_allow_or_deny('allow')
+        except Exception as e:
+            module.fail_json("Failed to load cron.allow file: {}".format(e))
+
+        try:
+            cron['deny'] = get_cron_allow_or_deny('deny')
+        except Exception as e:
+            module.fail_json("Failed to load cron.deny file: {}".format(e))
+
+    try:
+        cron['all_scanned_files'] = get_cron_data(cron['files'], strip_comments, parse_configs)
+    except Exception as e:
+        module.fail_json(msg="Failed to scan cron files: {}".format(e))
+
+    module.exit_json(**{ 'ansible_facts': {'cron': cron } })
 
 
 if __name__ == '__main__':

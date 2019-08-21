@@ -222,4 +222,6 @@
     - name: cleanup_no_permission_file
       # This has to be a command to actually remove this
       command: "rm -f {{ no_permissions_file }}"
-      warn: false
+      args:
+        warn: false
+        removes: "{{ no_permissions_file }}"

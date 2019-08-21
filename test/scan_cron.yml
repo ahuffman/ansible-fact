@@ -53,7 +53,6 @@
           - cron.all_scanned_files[0]['configuration'] | length() == 57
           - cron.all_scanned_files[0]['data']['schedules'] | length() == 19
           - "'timeperiod' not in cron.all_scanned_files[0]['data']['schedules'][0]"
-        msg: "{{ cron }}"
 #                "data": {
 #                    "schedules": [
 #                        {

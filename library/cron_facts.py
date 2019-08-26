@@ -36,6 +36,7 @@ options:
         required: False
 author:
     - Andrew J. Huffman (@ahuffman)
+    - John Westcott IV (@john-westcott-iv)
 '''
 
 EXAMPLES = '''

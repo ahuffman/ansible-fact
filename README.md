@@ -1,4 +1,6 @@
 # ansible-fact
+[![Build Status](https://travis-ci.com/ahuffman/ansible-fact.svg?branch=dev)](https://travis-ci.com/ahuffman/ansible-fact)
+
 ## Table of Contents
 <!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:1 -->
 
@@ -40,7 +42,7 @@ Please feel free to openly contribute to this project.  All code will be reviewe
 * Please document your code and modules thoroughly via comments and by following [Ansible's Module Development Documentation](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html#starting-a-new-module).
 
 ## Author(s)
-[Andrew J. Huffman](https://github.com/ahuffman)
+[Andrew J. Huffman](https://github.com/ahuffman)  
 [John Westcott IV](https://github.com/john-westcott-iv)
 
 ## Licensing

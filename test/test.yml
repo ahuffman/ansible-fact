@@ -1,0 +1,21 @@
+---
+- name: "Initiate tests"
+  hosts: "localhost"
+  tasks:
+    - debug:
+        msg: "Initiating test playbook runs"
+
+- name: "cron_facts"
+  import_playbook: "cron_facts.yml"
+
+- name: "package_repository_facts"
+  import_playbook: "package_repository_facts.yml"
+
+- name: "process_facts"
+  import_playbook: "process_facts.yml"
+
+- name: "sudoers_facts"
+  import_playbook: "sudoers_facts.yml"
+
+- name: "user_group_facts"
+  import_playbook: "user_group_facts.yml"

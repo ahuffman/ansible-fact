@@ -41,3 +41,6 @@ Please feel free to openly contribute to this project.  All code will be reviewe
 
 ## Author(s)
 [Andrew J. Huffman](https://github.com/ahuffman)
+
+## Licensing
+Each module is licensed individually.  Please refer to the documentation header of each module for details.

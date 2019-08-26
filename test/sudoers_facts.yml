@@ -1,12 +1,12 @@
 ---
-- name: "Test scan_sudoers - Python 2.7"
+- name: "Test sudoers_facts - Python 2.7"
   hosts: "localhost"
   gather_facts: False
   vars:
     ansible_python_interpreter: "/usr/bin/python2.7"
   tasks:
     - name: "Scan Sudoers"
-      scan_sudoers:
+      sudoers_facts:
       become: True
 
     - name: "Display all sudoers data"
@@ -14,7 +14,7 @@
         var: "sudoers"
 
     - name: "Scan Sudoers - no parsed data"
-      scan_sudoers:
+      sudoers_facts:
         output_parsed_configs: False
       become: True
 
@@ -23,7 +23,7 @@
         var: "sudoers"
 
     - name: "Scan Sudoers - no raw configuration data"
-      scan_sudoers:
+      sudoers_facts:
         output_raw_configs: False
       become: True
 
@@ -31,14 +31,14 @@
       debug:
         var: "sudoers"
 
-- name: "Test scan_sudoers - Python 3.7"
+- name: "Test sudoers_facts - Python 3.7"
   hosts: "localhost"
   gather_facts: False
   vars:
     ansible_python_interpreter: "/usr/bin/python3.7"
   tasks:
     - name: "Scan Sudoers - all data"
-      scan_sudoers:
+      sudoers_facts:
       become: True
 
     - name: "Display all sudoers data"
@@ -46,7 +46,7 @@
         var: "sudoers"
 
     - name: "Scan Sudoers - no parsed data"
-      scan_sudoers:
+      sudoers_facts:
         output_parsed_configs: False
       become: True
 
@@ -55,7 +55,7 @@
         var: "sudoers"
 
     - name: "Scan Sudoers - no raw configuration data"
-      scan_sudoers:
+      sudoers_facts:
         output_raw_configs: False
       become: True
 

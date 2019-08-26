@@ -9,7 +9,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: scan_processes
+module: process_facts
 short_description: Collects currently running processes on a system
 version_added: "2.8"
 description:
@@ -32,17 +32,17 @@ author:
 EXAMPLES = '''
 # Collect running processes and output parsed data
 - name: "Collect current running processes"
-  scan_processes:
+  process_facts:
 
 # Collect only standard out lines from the ps auxww command
 - name: "Collect process command output"
-  scan_processes:
+  process_facts:
     output_ps_stdout_lines: True
     output_parsed_processes: False
 
 # Collect both parsed process data and 'ps auxww' command standard out
 - name: "Collect all process data"
-  scan_processes:
+  process_facts:
     output_ps_stdout_lines: True
 '''
 

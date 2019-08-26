@@ -1,12 +1,12 @@
 ---
-- name: "Test scan_processes - Python 2.7"
+- name: "Test process_facts - Python 2.7"
   hosts: "localhost"
   gather_facts: False
   vars:
     ansible_python_interpreter: "/usr/bin/python2.7"
   tasks:
     - name: "Scan Processes - Show Everything"
-      scan_processes:
+      process_facts:
         output_ps_stdout_lines: True
       become: True
 
@@ -15,7 +15,7 @@
         var: "running_processes"
 
     - name: "Collect only process standard out lines"
-      scan_processes:
+      process_facts:
         output_ps_stdout_lines: True
         output_parsed_processes: False
       become: True
@@ -25,21 +25,21 @@
         var: "running_processes"
 
     - name: "Collect only parsed process data"
-      scan_processes:
+      process_facts:
       become: True
 
     - name: "Display Parsed Processes only"
       debug:
         var: "running_processes"
 
-- name: "Test scan_processes - Python 3.7"
+- name: "Test process_facts - Python 3.7"
   hosts: "localhost"
   gather_facts: False
   vars:
     ansible_python_interpreter: "/usr/bin/python3.7"
   tasks:
     - name: "Scan Processes - Show Everything"
-      scan_processes:
+      process_facts:
         output_ps_stdout_lines: True
       become: True
 
@@ -48,7 +48,7 @@
         var: "running_processes"
 
     - name: "Collect only process standard out lines"
-      scan_processes:
+      process_facts:
         output_ps_stdout_lines: True
         output_parsed_processes: False
       become: True
@@ -58,7 +58,7 @@
         var: "running_processes"
 
     - name: "Collect only parsed process data"
-      scan_processes:
+      process_facts:
       become: True
 
     - name: "Display Parsed Processes only"

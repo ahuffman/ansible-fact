@@ -20,11 +20,11 @@ The concept of this project is to perform Infrastructure-as-Code in Reverse (i.e
 ## Available Modules
 | Module Name | Description | Test Playbook |
 | --- | --- | --- |
-| [scan_cron](library/scan_cron.py) | Collects all cron data from a system and converts to structured data | [scan_cron.yml](test/scan_cron.yml) |
-| [scan_package_repositories](library/scan_package_repositories.py) | Collects configured package repository data from a system and converts to structured data. | [scan_package_repositories.yml](test/scan_package_repositories.yml) |
-| [scan_processes](library/scan_processes.py) | Collects currently running processes from a system and converts to structured data | [scan_processes.yml](test/scan_processes.yml) |
-| [scan_sudoers](library/scan_sudoers.py) | Collects all sudoers configurations and converts to structured data | [scan_sudoers.yml](test/scan_sudoers.yml) |
-| [scan_user_group](library/scan_user_group.py) | Collects all local user and group data from `/etc/shadow`, `/etc/gshadow`, `/etc/passwd`, and `/etc/group`, and merges into structured data. | [scan_user_group.yml](test/scan_user_group.yml)
+| [cron_facts](library/cron_facts.py) | Collects all cron data from a system and converts to structured data | [cron_facts.yml](test/cron_facts.yml) |
+| [package_repository_facts](library/package_repository_facts.py) | Collects configured package repository data from a system and converts to structured data. | [package_repository_facts.yml](test/package_repository_facts.yml) |
+| [process_facts](library/process_facts.py) | Collects currently running processes from a system and converts to structured data | [process_facts.yml](test/process_facts.yml) |
+| [sudoers_facts](library/sudoers_facts.py) | Collects all sudoers configurations and converts to structured data | [sudoers_facts.yml](test/sudoers_facts.yml) |
+| [user_group_facts](library/user_group_facts.py) | Collects all local user and group data from `/etc/shadow`, `/etc/gshadow`, `/etc/passwd`, and `/etc/group`, and merges into structured data. | [user_group_facts.yml](test/user_group_facts.yml)
 
 ## Module Documentation
 All module documentation can be found in each respective module, as with any Ansible module.

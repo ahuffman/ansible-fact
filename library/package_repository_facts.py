@@ -9,7 +9,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: scan_package_repositories
+module: package_repository_facts
 short_description: Collects all package repositories on a system
 version_added: "2.8"
 description:

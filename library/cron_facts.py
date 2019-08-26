@@ -9,7 +9,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: scan_cron
+module: cron_facts
 short_description: Collects cron job facts
 version_added: "2.8"
 description:
@@ -40,19 +40,18 @@ author:
 
 EXAMPLES = '''
 - name: "Collect all cron data"
-  scan_cron:
+  cron_facts:
 
 - name: "Strip comments and empty lines in configuration"
-  scan_cron:
+  cron_facts:
     strip_comments: False
 
 - name: "Dont parse configuration"
-  scan_cron:
+  cron_facts:
     parse_configs: False
 '''
 
 RETURN = '''
-<<<<<<< HEAD
 # From a default Fedora configuration
 ansible_facts:
   cron:
@@ -219,7 +218,7 @@ from grp import getgrgid
 
 def get_cron_allow_or_deny(allow_or_deny):
     file_name = "/etc/cron.{}".format(allow_or_deny)
-    results = None 
+    results = None
     # Allow this to raise an exception
     if isfile(file_name):
         results = {
@@ -414,7 +413,7 @@ def main():
     cron_files = module.params.get('cron_files')
     strip_comments = module.params.get('strip_comments')
     parse_configs = module.params.get('parse_configs')
-    
+
     try:
         cron = { 'files': get_cron_files(cron_files), }
     except Exception as e:

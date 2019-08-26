@@ -1,12 +1,12 @@
 ---
-- name: "Test scan_user_group - Python 2.7"
+- name: "Test user_group_facts - Python 2.7"
   hosts: "localhost"
   gather_facts: False
   vars:
     ansible_python_interpreter: "/usr/bin/python2.7"
   tasks:
     - name: "Scan users and groups"
-      scan_user_group:
+      user_group_facts:
       become: True
 
     - name: "Display local user facts"
@@ -18,14 +18,14 @@
         var: "local_groups"
 
 
-- name: "Test scan_user_group - Python 3.7"
+- name: "Test user_group_facts - Python 3.7"
   hosts: "localhost"
   gather_facts: False
   vars:
     ansible_python_interpreter: "/usr/bin/python3.7"
   tasks:
     - name: "Scan users and groups"
-      scan_user_group:
+      user_group_facts:
       become: True
 
     - name: "Display local user facts"

@@ -9,7 +9,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: scan_user_group
+module: user_group_facts
 short_description: "Parses the local users and groups on a system"
 version_added: "2.7"
 author:
@@ -46,17 +46,17 @@ options:
 
 EXAMPLES = '''
 - name: "Scan Users and Groups with defaults"
-  scan_user_group:
+  user_group_facts:
 
 - name: "Scan Users and Groups with path overrides"
-  scan_user_group:
+  user_group_facts:
     passwd_path: "/etc/passwd2"
     shadow_path: "/etc/shadow-"
     group_path: "/etc/group2"
     gshadow_path: "/etc/gshadow2"
 
 - name: "Parse backed up shadow file"
-  scan_user_group:
+  user_group_facts:
     shadow_path: "/etc/shadow-"
 '''
 

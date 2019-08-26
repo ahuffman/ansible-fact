@@ -1,0 +1,82 @@
+---
+- name: "Test cron_facts"
+  hosts: "localhost"
+  gather_facts: False
+  vars:
+    cron_files:
+      - crontabs/etc/cron.deny
+      - crontabs/etc/cron.daily/rhsmd.rhel8
+      - crontabs/etc/cron.daily/logrotate.rhel8
+      - crontabs/etc/cron.hourly/0anacron.rhel8
+      - crontabs/etc/cron.d/raid-check.rhel8
+      - crontabs/etc/cron.d/0hourly.rhel8
+      - crontabs/var/spool/cron/root/test_1
+  become: False
+  vars:
+    force_handlers: True
+    no_permissions_file: crontabs/no_permissions
+
+  tasks:
+    - name: "Create a sample file with no permissions"
+      file:
+        path: "{{ no_permissions_file }}"
+        mode: "000"
+        state: touch
+      notify: cleanup_no_permission_file
+
+    - name: "Attempt to load a file with no permissions"
+      cron_facts:
+        cron_files:
+          - "{{ no_permissions_file }}"
+      ignore_errors: True
+      register: read_failure
+
+    - assert:
+        that:
+          - read_failure is failed
+          - "'Permission denied' in read_failure.msg"
+
+    - name: "Set the permissions to 644 for assertion"
+      file:
+        path: crontabs/var/spool/cron/root/test_1
+        mode: "0644"
+        state: touch
+
+    - name: "Load the test_1 crontab"
+      cron_facts:
+        cron_files:
+          - crontabs/var/spool/cron/root/test_1
+
+    - debug:
+        msg:
+          - "Here are the assertion values we are going to look at"
+          - "{{ cron.files | length() }} == 1"
+          - "{{ cron.files[0]['path'] }} == 'crontabs/var/spool/cron/root/test_1'"
+          - "{{ cron.files[0]['permissions'] }} == '0644'"
+          - "'user' in {{ cron.files[0] }}"
+          - "'group' in {{ cron.files[0] }}"
+          - "{{ cron.all_scanned_files | length() }} == 1"
+          - "{{ cron.all_scanned_files[0]['configuration'] | length() }} == 57"
+          - "{{ cron.all_scanned_files[0]['data']['schedules'] | length() }} == 19"
+          - "'timeperiod' not in {{ cron.all_scanned_files[0]['data']['schedules'][0] }}"
+
+    - name: Validate that all cronjobs were loaded
+      assert:
+        that:
+          - cron.files | length() == 1
+          - cron.files[0]['path'] == "crontabs/var/spool/cron/root/test_1"
+          - cron.files[0]['permissions'] == "0644"
+          - "'user' in cron.files[0]"
+          - "'group' in cron.files[0]"
+          - cron.all_scanned_files | length() == 1
+          - cron.all_scanned_files[0]['configuration'] | length() == 57
+          - cron.all_scanned_files[0]['data']['schedules'] | length() == 19
+          - "'timeperiod' not in cron.all_scanned_files[0]['data']['schedules'][0]"
+
+  handlers:
+    - name: cleanup_no_permission_file
+      # This has to be a command to actually remove this
+      command: "rm -f {{ no_permissions_file }}"
+      args:
+        warn: false
+        removes: "{{ no_permissions_file }}"

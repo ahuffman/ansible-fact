@@ -9,7 +9,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: "scan_sudoers"
+module: "sudoers_facts"
 short_description: "Parses the /etc/sudoers and /etc/sudoers.d/* files."
 version_added: "2.7"
 author:
@@ -33,18 +33,18 @@ options:
 
 EXAMPLES = '''
 - name: "Scan sudoers files - output everything"
-  scan_sudoers:
+  sudoers_facts:
 
 - name: "Scan sudoers files - output raw configuration lines only"
-  scan_sudoers:
+  sudoers_facts:
     output_parsed_configs: False
 
 - name: "Scan sudoers files - output parsed configurations only"
-  scan_sudoers:
+  sudoers_facts:
     output_raw_configs: False
 
 - name: "Scan sudoers files - output only included files and paths (minimal output)"
-  scan_sudoers:
+  sudoers_facts:
     output_raw_configs: False
     output_parsed_configs: False
 '''

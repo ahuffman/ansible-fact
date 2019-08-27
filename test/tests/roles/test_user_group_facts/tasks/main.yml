@@ -1,0 +1,66 @@
+---
+- name: "Collect local user and group facts"
+  user_group_facts:
+  become: True
+
+- name: "Display local user facts"
+  debug:
+    var: "local_users"
+
+- name: "Display local group facts"
+  debug:
+    var: "local_groups"
+
+- debug:
+    msg:
+      - "Here are the assertion values we are going to look at:"
+      - "{{ local_users | length }} > 1"
+      - "{{ local_users[0].account_expiration | length }} == 0"
+      - "'{{ local_users[0].comment | string }}' == 'root'"
+      - "{{ local_users[0].encrypted_password | length }} > 0"
+      - "{{ local_users[0].gid }} == 0"
+      - "'{{ local_users[0].home }}' == '/root'"
+      - "{{ local_users[0].last_pw_change | length }} == 0"
+      - "{{ local_users[0].max_pw_age }} == 99999"
+      - "{{ local_users[0].min_pw_age }} == 0"
+      - "{{ local_users[0].pw_inactive_days | length }} == 0"
+      - "{{ local_users[0].pw_warning_days }} == 7"
+      - "{{ local_users[0].reserved | length }} == 0"
+      - "{{ local_users[0].shadow | bool }} is True"
+      - "'{{ local_users[0].shell }}' == '/bin/bash'"
+      - "{{ local_users[0].uid }} == 0"
+      - "'{{ local_users[0].user }}' == 'root'"
+      - "{{ local_groups | length }} > 1"
+      - "{{ local_groups[0].administrators | length }} == 0"
+      - "{{ local_groups[0].encrypted_password | length }} == 0"
+      - "{{ local_groups[0].gid }} == 0"
+      - "'{{ local_groups[0].group | quote }}' == 'root'"
+      - "{{ local_groups[0].gshadow | bool }} is True"
+      - "{{ local_groups[0].members | length }} == 0"
+
+- name: "Validate local user and group facts"
+  assert:
+    that:
+      - "{{ local_users | length }} > 1"
+      - "{{ local_users[0].account_expiration | length }} == 0"
+      - "'{{ local_users[0].comment | string }}' == 'root'"
+      - "{{ local_users[0].encrypted_password | length }} > 0"
+      - "{{ local_users[0].gid }} == 0"
+      - "'{{ local_users[0].home }}' == '/root'"
+      - "{{ local_users[0].last_pw_change | length }} == 0"
+      - "{{ local_users[0].max_pw_age }} == 99999"
+      - "{{ local_users[0].min_pw_age }} == 0"
+      - "{{ local_users[0].pw_inactive_days | length }} == 0"
+      - "{{ local_users[0].pw_warning_days }} == 7"
+      - "{{ local_users[0].reserved | length }} == 0"
+      - "{{ local_users[0].shadow | bool }}"
+      - "'{{ local_users[0].shell }}' == '/bin/bash'"
+      - "{{ local_users[0].uid }} == 0"
+      - "'{{ local_users[0].user }}' == 'root'"
+      - "{{ local_groups | length }} > 1"
+      - "{{ local_groups[0].administrators | length }} == 0"
+      - "{{ local_groups[0].encrypted_password | length }} == 0"
+      - "{{ local_groups[0].gid }} == 0"
+      - "'{{ local_groups[0].group | quote }}' == 'root'"
+      - "{{ local_groups[0].gshadow | bool }}"
+      - "{{ local_groups[0].members | length }} == 0"

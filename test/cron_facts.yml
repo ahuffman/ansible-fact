@@ -11,10 +11,9 @@
       - crontabs/etc/cron.d/raid-check.rhel8
       - crontabs/etc/cron.d/0hourly.rhel8
       - crontabs/var/spool/cron/root/test_1
-  become: False
-  vars:
-    force_handlers: True
     no_permissions_file: crontabs/no_permissions
+  become: False
+  force_handlers: True
 
   tasks:
     - name: "Create a sample file with no permissions"

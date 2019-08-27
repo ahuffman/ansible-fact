@@ -1,21 +1,51 @@
 ---
 - name: "Initiate tests"
   hosts: "localhost"
+  gather_facts: False
   tasks:
     - debug:
         msg: "Initiating test playbook runs"
 
-- name: "cron_facts"
-  import_playbook: "cron_facts.yml"
+    # Dynamic task and handler locatator to avoid manual test playbook builds later
+    - name: "Locate test tasks"
+      find:
+        paths:
+          - "tests/roles"
+        recurse: False
+        file_type: "directory"
+      register: "test_roles"
 
-- name: "package_repository_facts"
-  import_playbook: "package_repository_facts.yml"
+    - name: "Set test roles list"
+      set_fact:
+        testing_roles: "{{ test_roles.files | json_query('[*].path') }}"
 
-- name: "process_facts"
-  import_playbook: "process_facts.yml"
+    - name: "Output task and handlers lists"
+      debug:
+        var: "testing_roles"
 
-- name: "sudoers_facts"
-  import_playbook: "sudoers_facts.yml"
+# instantiate tests from dynamically discovered roles
+- name: "Run ansible-fact tests"
+  hosts: "localhost"
+  gather_facts: False
+  force_handlers: True
+  tasks:
+    - name: "Include testing roles"
+      include_role:
+        name: "{{ item }}"
+      with_items: "{{ testing_roles }}"
 
-- name: "user_group_facts"
-  import_playbook: "user_group_facts.yml"
+
+# - name: "cron_facts"
+#   import_playbook: "cron_facts.yml"
+#
+# - name: "package_repository_facts"
+#   import_playbook: "package_repository_facts.yml"
+#
+# - name: "process_facts"
+#   import_playbook: "process_facts.yml"
+#
+# - name: "sudoers_facts"
+#   import_playbook: "sudoers_facts.yml"
+#
+# - name: "user_group_facts"
+#   import_playbook: "user_group_facts.yml"

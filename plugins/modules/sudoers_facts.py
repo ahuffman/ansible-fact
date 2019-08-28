@@ -9,11 +9,12 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: "sudoers_facts"
+module: "scan_sudoers"
 short_description: "Parses the /etc/sudoers and /etc/sudoers.d/* files."
 version_added: "2.7"
 author:
     - "Andrew J. Huffman (@ahuffman)"
+    - John Westcott IV (@john-westcott-iv)
 description:
     - "This module is designed to collect information from C(/etc/sudoers).  The #include (files) and #includedir (directories) will be dynamically calculated and all included files will be parsed."
     - "This module is compatible with Linux and Unix systems."
@@ -33,18 +34,18 @@ options:
 
 EXAMPLES = '''
 - name: "Scan sudoers files - output everything"
-  sudoers_facts:
+  scan_sudoers:
 
 - name: "Scan sudoers files - output raw configuration lines only"
-  sudoers_facts:
+  scan_sudoers:
     output_parsed_configs: False
 
 - name: "Scan sudoers files - output parsed configurations only"
-  sudoers_facts:
+  scan_sudoers:
     output_raw_configs: False
 
 - name: "Scan sudoers files - output only included files and paths (minimal output)"
-  sudoers_facts:
+  scan_sudoers:
     output_raw_configs: False
     output_parsed_configs: False
 '''
@@ -115,38 +116,13 @@ sudoers:
                 ...
 '''
 
-from ansible.module_utils.basic import AnsibleModule
-import os
+from ansible_collections.john_westcott_iv.ansible_fact.plugins.module_utils.fact_gatherer import FactGatherer
+from os import listdir
 from os.path import isfile, join
 import re
 
-def main():
-    module_args = dict(
-        output_raw_configs=dict(
-            type='bool',
-            default=True,
-            required=False
-        ),
-        output_parsed_configs=dict(
-            type='bool',
-            default=True,
-            required=False
-        )
-    )
-
-    result = dict(
-        changed=False,
-        original_message='',
-        message=''
-    )
-
-    module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True
-    )
-    params = module.params
-
-    def get_includes(path):
+class SudoersGatherer(FactGatherer):
+    def get_includes(self, path):
         ## Get includes
         sudoers_file = open(path, 'r')
         includes = dict()
@@ -171,7 +147,7 @@ def main():
             # build multi-file output
             includes['include_directories'].append(include_dir)
             # Get list of all included sudoers files
-            includes['include_files'] += [join(include_dir, filename) for filename in os.listdir(include_dir) if isfile(join(include_dir, filename))]
+            includes['include_files'] += [join(include_dir, filename) for filename in listdir(include_dir) if isfile(join(include_dir, filename))]
         elif not includes['include_files']:
             includes.pop('include_files')
 
@@ -181,7 +157,7 @@ def main():
         sudoers_file.close()
         return includes
 
-    def get_user_specs(line, path):
+    def get_user_specs(self, line, path):
         user_spec = dict()
         user_spec_re =  re.compile(r'(^\S+,{1}\s*\S+|^\S+)\s*(\S+,{1}\s*|\S+){1}\s*={1}\s*(\({1}(.*)\){1})*\s*(ROLE\s*=\s*(\S+)|TYPE\s*=\s*(\S+))*\s*(ROLE\s*=\s*(\S+)|TYPE\s*=\s*(\S+))*\s*(PRIVS\s*=\s*(\S+)|LIMITPRIVS\s*=\s*(\S+))*\s*(PRIVS\s*=\s*(\S+)|LIMITPRIVS\s*=\s*(\S+))*\s*(\S+:{1})*\s*(.*$)')
         default_override_re = re.compile(r'(Defaults){1}([@:!>]){1}((\s*\S+,{1})+\s*\S+|\S+)\s*(.*$)')
@@ -325,7 +301,7 @@ def main():
                         user_spec['defaults'].append(default.lstrip())
         return user_spec
 
-    def get_config_lines(path):
+    def get_config_lines(self, path):
         # Read sudoers file
         all_lines = open(path, 'r')
         # Initialize empty return dict
@@ -354,7 +330,7 @@ def main():
         env_keep_opts = list()
 
         # Get includes from file
-        includes = get_includes(path)
+        includes = self.get_includes(path)
         # if we have included files add them to the list
         try:
             sudoer_file['include_files'] = includes['include_files']
@@ -368,7 +344,7 @@ def main():
         for l in all_lines:
             line = l.replace('\n', '').replace('\t', '    ') #cleaning up chars we don't want
             # only output raw config lines if we ask for them
-            if params['output_raw_configs']:
+            if self.output_raw_configs:
                 # All raw (non-comment) config lines out
                 if comment_re.search(line) is None and line != '' and line != None:
                     config_lines.append(line)
@@ -376,7 +352,7 @@ def main():
                     config_lines.append(line)
 
             # only output parsed configs if we ask for them
-            if params['output_parsed_configs']:
+            if self.output_parsed_configs:
                 # Parser for defaults
                 if defaults_re.search(line):
                     defaults_config_line = defaults_re.search(line).group(2)
@@ -506,16 +482,16 @@ def main():
                    not include_re.search(line) and not comment_re.search(line) and \
                    not defaults_re.search(line) and line != '' and \
                    line != None:
-                    user_spec = get_user_specs(line, path)
+                    user_spec = self.get_user_specs(line, path)
                     user_specifications.append(user_spec)
         # Build the sudoer file's dict output
         sudoer_file['path'] = path
 
         # only output raw configs if we ask for it
-        if params['output_raw_configs']:
+        if self.output_raw_configs:
             sudoer_file['configuration'] = config_lines
 
-        if params['output_parsed_configs']:
+        if self.output_parsed_configs:
             # Build defaults env_keep dict and append to the rest of the config_defaults list
             if env_keep_opts:
                 config_defaults.append({'env_keep': env_keep_opts})
@@ -539,13 +515,13 @@ def main():
         all_lines.close()
         return sudoer_file
 
-    def get_sudoers_configs(path):
+    def get_sudoers_configs(self):
         sudoers = dict()
         include_files = list()
 
         # Get parsed values from default sudoers file
         sudoers['sudoers_files'] = list()
-        default = get_config_lines(path)
+        default = self.get_config_lines(self.sudoers_path)
         if default:
             sudoers['sudoers_files'].append(default)
             try:
@@ -553,8 +529,8 @@ def main():
             except:
                 pass
         # Capture each included sudoer file
-        for file in include_files:
-            include_file = get_config_lines(file)
+        for a_file in include_files:
+            include_file = self.get_config_lines(a_file)
             if include_file:
                 sudoers['sudoers_files'].append(include_file)
             # append even more included files as we parse deeper
@@ -563,16 +539,38 @@ def main():
             except:
                 pass
         # return back everything that was included off of the default sudoers file
-        include_files.append(default_sudoers)
+        include_files.append(self.sudoers_path)
         sudoers['all_scanned_files'] = include_files
         return sudoers
 
 
-    default_sudoers = '/etc/sudoers'
-    sudoers = get_sudoers_configs(default_sudoers)
-    result = {'ansible_facts': {'sudoers': sudoers}}
+    def doDefault(self):
+        sudoers = self.get_sudoers_configs()
+        result = {'ansible_facts': {'sudoers': sudoers}}
+        self.exit_json(**result)
 
-    module.exit_json(**result)
+
+    def __init__(self, argument_spec, **kwargs):
+        # Call the parent constructor
+        super(SudoersGatherer, self).__init__(argument_spec=argument_spec, **kwargs)
+        # Extract the module params into class variables
+        self.output_raw_configs = self.params['output_raw_configs']
+        self.output_parsed_configs = self.params['output_parsed_configs']
+        # Set additional class variables
+        self.sudoers_path='/etc/sudoers'
+
+
+def main():
+    module = SudoersGatherer(
+        dict(
+            output_raw_configs=dict(type='bool', default=True, required=False),
+            output_parsed_configs=dict(type='bool', default=True, required=False)
+        ),
+        supports_check_mode=True,
+    )
+
+    module.main()
+
 
 
 if __name__ == '__main__':

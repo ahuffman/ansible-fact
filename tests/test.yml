@@ -2,6 +2,9 @@
 - name: "Initiate tests"
   hosts: "localhost"
   gather_facts: False
+  collections:
+    - john_westcott_iv.ansible_fact
+
   tasks:
     - debug:
         msg: "Initiating test playbook runs"
@@ -28,6 +31,9 @@
   hosts: "localhost"
   gather_facts: False
   force_handlers: True
+  collections:
+    - john_westcott_iv.ansible_fact
+
   tasks:
     - name: "Include testing roles"
       include_role:

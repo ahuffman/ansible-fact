@@ -36,7 +36,7 @@
     #     name: "{{ item }}"
     #   with_items: "{{ testing_roles }}"
     - name: "quick test"
-      user_group_facts:
+      cron_facts:
       become: True
 
 

@@ -32,12 +32,12 @@
     - "ansible_fact.os_facts"
   tasks:
     - debug:
-        var: "{{ item | dirname }}"
+        var: "{{ item | basename }}"
       with_items: "{{ testing_roles }}"
 
     - name: "Include testing roles"
       include_role:
-        name: "{{ item | dirname }}"
+        name: "{{ item | basename }}"
       with_items: "{{ testing_roles }}"
 
 # - name: "cron_facts"

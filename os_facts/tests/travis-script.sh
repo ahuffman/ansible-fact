@@ -17,4 +17,4 @@ pwd
 echo
 echo "Launching Test Playbook"
 
-ansible-playbook test.yml
+ansible-playbook test.yml -vvv

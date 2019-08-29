@@ -74,7 +74,7 @@ local_groups:
     sample: "[{'administrators': [], 'encrypted_password': '', 'gid': '0', 'group': 'root', 'gshadow': True, 'members': []}]"
 '''
 
-from ansible_collections.john_westcott_iv.ansible_fact.plugins.module_utils.fact_gatherer import FactGatherer
+from ansible_collections.ansible_fact.os_facts.plugins.module_utils.fact_gatherer import FactGatherer
 from os.path import isfile
 
 class UserGroupGatherer(FactGatherer):
@@ -86,13 +86,13 @@ class UserGroupGatherer(FactGatherer):
                     lines.append(self.remove_comment(a_line.replace("\n", ""), '#'))
         except Exception as e:
             self.fail_json(msg="Failed to read {} : {}".format(file_name, e))
-        
+
         return lines
-            
+
     def get_passwd(self):
         # conditional for OS type and set path if diverges from Linux
         users = list()
-        if not isfile(self.passwd_path): 
+        if not isfile(self.passwd_path):
             return users
         line_number = 0
         for a_line in self.read_lines(self.passwd_path):
@@ -119,7 +119,7 @@ class UserGroupGatherer(FactGatherer):
     def get_shadow(self):
         # conditional for OS type and set path if diverges from Linux
         susers = list()
-        if not isfile(self.shadow_path): 
+        if not isfile(self.shadow_path):
             return susers
         line_number = 0
         for a_line in self.read_lines(self.shadow_path):
@@ -139,12 +139,12 @@ class UserGroupGatherer(FactGatherer):
                 susers.append(user)
             elif len(fields) > 1 or fields[0] != '':
                 self.fail_json(msg="Failed to parse line {} in {}".format(line_number, self.passwd_path))
-            
+
         return susers
 
     def get_group(self):
         groups = list()
-        if not isfile(self.group_path): 
+        if not isfile(self.group_path):
             return groups
         line_number = 0
         for a_line in self.read_lines(self.group_path):
@@ -167,7 +167,7 @@ class UserGroupGatherer(FactGatherer):
                     members = list()
                 group['members'] = members
                 groups.append(group)
-            # An empty string will be split into [''] 
+            # An empty string will be split into ['']
             elif len(fields) > 1 or fields[0] != '':
                 self.fail_json(msg="Failed to parse line {} in {}: {}".format(line_number, self.group_path, a_line))
 
@@ -175,7 +175,7 @@ class UserGroupGatherer(FactGatherer):
 
     def get_gshadow(self):
         sgroups = list()
-        if not isfile(self.gshadow_path): 
+        if not isfile(self.gshadow_path):
             return sgroups
         line_number = 0
         for a_line in self.read_lines(self.gshadow_path):

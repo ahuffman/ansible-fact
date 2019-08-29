@@ -17,7 +17,7 @@
 
     - name: "Set test roles list"
       set_fact:
-        testing_roles: "{{ test_roles.files | json_query('[*].path') }}"
+        testing_roles: "{{ test_roles.files | json_query('[*].path | dirname') }}"
 
     - name: "Output discovered testing roles"
       debug:

@@ -1,6 +1,6 @@
 ---
 - name: "Collect local user and group facts"
-  ansible_fact.os_facts.user_group_facts:
+  user_group_facts:
   become: True
 
 - name: "Display local user facts"

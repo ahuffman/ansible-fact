@@ -3,14 +3,13 @@
   hosts: "localhost"
   gather_facts: False
   collections:
-    - john_westcott_iv.ansible_fact
-
+    - "ansible_fact.os_facts"
   tasks:
     - debug:
         msg: "Initiating test playbook runs"
 
-    # Dynamic task and handler locatator to avoid manual test playbook builds later
-    - name: "Locate test tasks"
+    # Dynamic test role locatator to avoid manual test playbook builds later
+    - name: "Locate test roles"
       find:
         paths:
           - "tests/roles"
@@ -22,7 +21,7 @@
       set_fact:
         testing_roles: "{{ test_roles.files | json_query('[*].path') }}"
 
-    - name: "Output task and handlers lists"
+    - name: "Output discovered testing roles"
       debug:
         var: "testing_roles"
 

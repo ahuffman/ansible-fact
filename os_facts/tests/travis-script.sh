@@ -1,15 +1,20 @@
 #! /bin/bash
 
-echo "Running on Ansible version"
+echo "Running on Ansible version:"
 ansible-playbook --version
 echo "------------------------------------------"
 
 # TEMP Travis Testing
-echo "****************** TEMP TESTING ************************"
-ls /root/.ansible/collections/ansible_collections/john_westcott_iv/ansible_fact
-echo "****************** END TEMP TESTING ************************"
+echo "Collection Content:"
+ls -lh /root/ansible-fact/os_facts/collections/ansible_collections/ansible_fact/os_facts
+ls -alh /root/ansible-fact/os_facts/collections/ansible_collections/ansible_fact/os_facts/
+echo
+echo
 
-cd /root/ansible-fact/tests/
+cd /root/ansible-fact/os_facts/tests/
 # display working dir
 pwd
+echo
+echo "Launching Test Playbook"
+
 ansible-playbook test.yml

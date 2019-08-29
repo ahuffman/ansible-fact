@@ -10,17 +10,14 @@ before_script:
   - docker pull centos:centos7
   - cd ../
   - pwd
+  # fire up the container
   - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/root/ansible-fact centos:centos7 /bin/bash
   # get container info
   - docker inspect centos7
+  # install what we need
   - docker exec -it centos7 yum install -y epel-release centos-release-scl
   - docker exec -it centos7 yum install -y ansible # scl-utils rh-python36-python
 # for testing 3.x python (need to move this somewhere else later - let's get basics working 1st)
 #  - scl enable rh-python36 bash && yum install -y ansible
-  # Make the collection directory
-  - docker exec -it centos7 mkdir -p /root/.ansible/collections/ansible_collections/john_westcott_iv
-  # "Install" the collection
-  - docker exec -it centos7 ln -s /root/ansible-fact /root/.ansible/collections/ansible_collections/john_westcott_iv/ansible_fact
-
 script:
-  - docker exec -it centos7 /root/ansible-fact/tests/travis-script.sh
+  - docker exec -it centos7 /root/ansible-fact/os_facts/tests/travis-script.sh

@@ -17,7 +17,7 @@
 
     - name: "Set test roles list"
       set_fact:
-        testing_roles: "{{ test_roles.files | json_query('[*].path | dirname') }}"
+        testing_roles: "{{ test_roles.files | json_query('[*].path') }}"
 
     - name: "Output discovered testing roles"
       debug:
@@ -33,7 +33,7 @@
   tasks:
     - name: "Include testing roles"
       include_role:
-        name: "{{ item }}"
+        name: "{{ item | dirname }}"
       with_items: "{{ testing_roles }}"
 
 # - name: "cron_facts"

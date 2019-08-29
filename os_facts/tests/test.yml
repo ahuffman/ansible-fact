@@ -31,14 +31,13 @@
   collections:
     - "ansible_fact.os_facts"
   tasks:
-    - name: "Include testing roles"
+    # - name: "Include testing roles"
+    #   include_role:
+    #     name: "{{ item }}"
+    #   with_items: "{{ testing_roles }}"
+    - name: test role
       include_role:
-        name: "{{ item }}"
-        apply:
-          collections:
-            - "ansible_fact.os_facts"
-      with_items: "{{ testing_roles }}"
-
+        name: "test_cron_facts"
 
 # - name: "cron_facts"
 #   import_playbook: "cron_facts.yml"

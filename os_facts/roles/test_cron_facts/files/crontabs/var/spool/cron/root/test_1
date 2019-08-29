@@ -1,0 +1,57 @@
+# Pulled from https://tecadmin.net/crontab-in-linux-with-20-examples-of-cron-schedule/
+
+# Schedule a cron to execute at 2am daily
+0 2 * * * /bin/sh backup.sh
+
+# Schedule a cron to execute twice a day
+0 5,17 * * * /scripts/script.sh
+
+# Schedule a cron to execute on every minutes
+* * * * *  jane /scripts/script.sh
+
+# Schedule a cron to execute on every Sunday at 5 PM
+0 17 * * sun  /scripts/script.sh
+
+# Schedule a cron to execute on every 10 minutes
+*/10 * * * * /scripts/monitor.sh
+
+# Schedule a cron to execute on selected months
+* * * jan,may,aug *  /script/script.sh
+
+# Schedule a cron to execute on selected days
+0 17 * * sun,fri  /script/script.sh
+
+# Schedule a cron to execute on first sunday of every month
+0 2 * * sun  [ $(date +%d) -le 07 ] && /script/script.sh
+
+#Schedule a cron to execute on every four hours
+0 */4 * * * /scripts/script.sh
+
+# Schedule a cron to execute twice on every Sunday and Monday.
+0 4,17 * * sun,mon /scripts/script.sh
+
+# Schedule a cron to execute on every 30 Seconds
+* * * * * /scripts/script.sh
+* * * * *  sleep 30; /scripts/script.sh
+
+# Schedule a multiple tasks in single cron
+* * * * * /scripts/script.sh; /scripts/scrit2.sh
+
+# Schedule tasks to execute on yearly ( @yearly ).
+@yearly /scripts/script.sh
+
+# Schedule tasks to execute on monthly ( @monthly )
+@monthly /scripts/script.sh
+
+# Schedule tasks to execute on Weekly ( @weekly )
+@weekly /bin/script.sh
+
+# Schedule tasks to execute on daily ( @daily )
+@daily /scripts/script.sh
+
+# Schedule tasks to execute on hourly ( @hourly )
+@hourly /scripts/script.sh
+
+# Schedule tasks to execute on system reboot ( @reboot )
+@reboot bob /scripts/script.sh
+

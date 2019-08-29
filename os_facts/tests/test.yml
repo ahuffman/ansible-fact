@@ -34,6 +34,9 @@
     - name: "Include testing roles"
       include_role:
         name: "{{ item }}"
+        apply:
+          collections:
+            - "ansible_fact.os_facts"
       with_items: "{{ testing_roles }}"
 
 

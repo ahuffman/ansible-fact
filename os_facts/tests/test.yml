@@ -30,15 +30,14 @@
   force_handlers: True
   collections:
     - "ansible_fact.os_facts"
-
   tasks:
-    - name: "Include testing roles"
-      include_role:
-        name: "{{ item }}"
-        # apply:
-        #   collections:
-        #     - "ansible_fact.os_facts"
-      with_items: "{{ testing_roles }}"
+    # - name: "Include testing roles"
+    #   include_role:
+    #     name: "{{ item }}"
+    #   with_items: "{{ testing_roles }}"
+    - name: "quick test"
+      user_group_facts:
+      become: True
 
 
 # - name: "cron_facts"

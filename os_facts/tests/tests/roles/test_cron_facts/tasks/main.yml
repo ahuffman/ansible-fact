@@ -9,7 +9,7 @@
       notify: "cleanup"
 
     - name: "Attempt to load a file with no permissions"
-      cron_facts:
+      ansible_fact.os_facts.cron_facts:
         cron_files:
           - "{{ no_permissions_file }}"
       ignore_errors: True
@@ -28,7 +28,7 @@
         state: "touch"
 
     - name: "Load the test_1 crontab"
-      cron_facts:
+      ansible_fact.os_facts.cron_facts:
         cron_files:
           - "tests/roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1"
 

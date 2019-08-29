@@ -31,13 +31,10 @@
   collections:
     - "ansible_fact.os_facts"
   tasks:
-    # - name: "Include testing roles"
-    #   include_role:
-    #     name: "{{ item }}"
-    #   with_items: "{{ testing_roles }}"
-    - name: "quick test"
-      cron_facts:
-      become: True
+    - name: "Include testing roles"
+      include_role:
+        name: "{{ item }}"
+      with_items: "{{ testing_roles }}"
 
 
 # - name: "cron_facts"

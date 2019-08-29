@@ -66,10 +66,10 @@ running_processes:
           ...
         total_running_processes: 359
 '''
-    
-from ansible_collections.john_westcott_iv.ansible_fact.plugins.module_utils.fact_gatherer import FactGatherer
+
+from ansible_collections.ansible_fact.os_facts.plugins.module_utils.fact_gatherer import FactGatherer
 import re
-    
+
 class ProcessGatherer(FactGatherer):
     def get_processes(self, command):
         re_header = re.compile(r'^USER+.*')

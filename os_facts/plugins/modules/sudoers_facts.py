@@ -116,7 +116,7 @@ sudoers:
                 ...
 '''
 
-from ansible_collections.john_westcott_iv.ansible_fact.plugins.module_utils.fact_gatherer import FactGatherer
+from ansible_collections.ansible_fact.os_facts.plugins.module_utils.fact_gatherer import FactGatherer
 from os import listdir
 from os.path import isfile, join
 import re

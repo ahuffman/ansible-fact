@@ -81,7 +81,7 @@ files:
     permissions:
 '''
 
-from ansible_collections.john_westcott_iv.ansible_fact.plugins.module_utils.fact_gatherer import FactGatherer
+from ansible_collections.ansible_fact.os_facts.plugins.module_utils.fact_gatherer import FactGatherer
 from os.path import isfile, isdir, join
 from os import walk, stat as os_stat
 import re
@@ -92,7 +92,7 @@ from grp import getgrgid
 class CronGatherer(FactGatherer):
     def get_cron_allow_or_deny(self, allow_or_deny):
         file_name = "/etc/cron.{}".format(allow_or_deny)
-        results = None 
+        results = None
         # Allow this to raise an exception
         if isfile(file_name):
             results = {
@@ -103,7 +103,7 @@ class CronGatherer(FactGatherer):
                 for line in f:
                     results['users'].append(user)
         return results
-    
+
     def get_files(self, path, **kwargs):
         files = []
 
@@ -113,18 +113,18 @@ class CronGatherer(FactGatherer):
                 for a_file in f:
                     if 'extension' not in kwargs or a_file.endswith(kwargs['extension']):
                         files.append(join(r, a_file))
-    
+
         return files
-    
-    
+
+
     def get_cron_files(self):
         cron_paths = []
-    
+
         if len(self.cron_files) == 0:
             # standard cron locations for cron file discovery
             if isfile("/etc/crontab"):
                 cron_paths.append("/etc/crontab")
-    
+
             cron_dirs = [
                 "/etc/cron.hourly",
                 "/etc/cron.daily",
@@ -133,18 +133,18 @@ class CronGatherer(FactGatherer):
                 "/var/spool/cron",
                 "/etc/cron.d"
             ]
-    
+
             # Look for files in cron directories and append to cron_paths
             for a_dir in cron_dirs:
                 self.cron_files.extend( get_files(a_dir) )
-    
+
         else:
             for a_file in self.cron_files:
                 if isfile(a_file):
                     cron_paths.append(a_file)
-    
+
         octal_re = re.compile('^0o{0,1}')
-    
+
         return_files = []
         for a_file in cron_paths:
             file_stats = os_stat(a_file)
@@ -156,17 +156,17 @@ class CronGatherer(FactGatherer):
                 group = getgrgid( file_stats.st_gid ).gr_name
             except KeyError as e:
                 group = file_stats.st_gid
-    
+
             return_files.append({
               'path': a_file,
               'user': user,
               'group': group,
               'permissions': octal_re.sub('', oct( stat.S_IMODE(file_stats.st_mode) )).zfill(4),
             })
-    
+
         return return_files
-    
-    
+
+
     def get_cron_data(self, cron_paths):
         # Output data
         cron_data = list()
@@ -185,14 +185,14 @@ class CronGatherer(FactGatherer):
         #                                |                . Optional user
         #                                |                |                      .command
         alt_schedule_re = re.compile(r'^(@[a-zA-Z]+)[\s]+([A-Za-z0-9\-\_]*)[\s]*(.*)$')
-    
+
         # work on each file that was found
         for cron_file in cron_paths:
             job = {
                 'path': cron_file['path'],
                 'configuration': [],
             }
-    
+
             with open(cron_file['path'], 'r') as config:
                 first_line = True
                 for line in config:
@@ -206,20 +206,20 @@ class CronGatherer(FactGatherer):
                             job['configuration'].append(line)
                     else:
                         job['configuration'].append(line)
-    
-    
+
+
             if self.parse_configs and len(job['configuration']) > 0:
                 job_info = {}
-    
+
                 # Get the shebang line
                 shebang_results = shebang_re.search(job['configuration'][0])
                 if shebang_results != None:
                     job_info['shell'] = shebang_results.group(2)
-    
+
                 ##  don't try if a shell is set on the file, because it's a script at that point
                 if 'shell' not in job_info:
                     for line in job['configuration']:
-    
+
                         # Capture cron schedules:
                         regular_schedule_results = schedule_re.search(line)
                         if regular_schedule_results != None:
@@ -236,7 +236,7 @@ class CronGatherer(FactGatherer):
                             # optional user field in some implementations
                             if regular_schedule_results.group(6):
                                 job_info['schedules'][-1]['user'] = regular_schedule_results.group(6)
-    
+
                         else:
                             # Capture alt cron format
                             alt_schedule_results = alt_schedule_re.search(line)
@@ -249,7 +249,7 @@ class CronGatherer(FactGatherer):
                                 })
                                 if alt_schedule_results.group(2):
                                     job_info['schedules'][-1]['user'] = alt_schedule_results.group(2)
-    
+
                             else:
                                 # Capture script variables
                                 variable_results = variable_re.search(line)
@@ -260,18 +260,18 @@ class CronGatherer(FactGatherer):
                                         'name': variable_results.group(1),
                                         'value': variable_results.group(2),
                                     })
-    
+
                 job['data'] = job_info
-    
+
             # append each parsed file
             cron_data.append(job)
         return cron_data
-    
+
     def doDarwin(self):
         self.doDefault()
 
     def doDefault(self):
-        
+
         try:
             cron = { 'files': self.get_cron_files(), }
         except Exception as e:
@@ -283,7 +283,7 @@ class CronGatherer(FactGatherer):
                 cron['allow'] = self.get_cron_allow_or_deny('allow')
             except Exception as e:
                 self.fail_json(msg="Failed to load cron.allow file: {}".format(e))
-    
+
             try:
                 cron['deny'] = self.get_cron_allow_or_deny('deny')
             except Exception as e:
@@ -306,7 +306,7 @@ class CronGatherer(FactGatherer):
         # Set additional class variables
 
 
-    
+
 def main():
     module = CronGatherer(
         dict(

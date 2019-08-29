@@ -31,11 +31,6 @@
   collections:
     - "ansible_fact.os_facts"
   tasks:
-    - name: "Testing roles that will run:"
-      debug:
-        var: "item | basename"
-      with_items: "{{ testing_roles }}"
-
     - name: "Include testing roles"
       include_role:
         name: "{{ item | basename }}"

@@ -6,8 +6,8 @@ echo "------------------------------------------"
 
 # TEMP Travis Testing
 echo "Collection Content:"
-ls -lh /root/ansible-fact/os_facts/collections/ansible_collections/ansible_fact/os_facts
-ls -alh /root/ansible-fact/os_facts/collections/ansible_collections/ansible_fact/os_facts/
+ls -lh /root/ansible-fact/os_facts/tests/collections/ansible_collections/ansible_fact/os_facts
+ls -alh /root/ansible-fact/os_facts/tests/collections/ansible_collections/ansible_fact/os_facts/
 echo
 echo
 

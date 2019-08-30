@@ -2,6 +2,8 @@
 - name: "Test sudoers_facts - Python 2.7"
   hosts: "localhost"
   gather_facts: False
+  collections:
+    - "ansible_fact.os_facts"
   # vars:
   #   ansible_python_interpreter: "/usr/bin/python2.7"
   tasks:

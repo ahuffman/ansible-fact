@@ -37,4 +37,4 @@
     #   with_items: "{{ testing_roles }}"
     - name: "test adjacent role for collection modules"
       include_role:
-        name: "test_cron_facts"
+        name: "/root/ansible-fact/os_facts/tests/roles/test_cron_facts"

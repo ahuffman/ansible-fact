@@ -1,11 +1,17 @@
 #! /bin/bash
 
 echo "Running on Ansible version:"
-ansible-playbook --version
+ansible --version
 echo "------------------------------------------"
+echo
+echo "Ansible Configuration:"
+ansible-config dump --only-changed
+echo "------------------------------------------"
+echo
+echo
 
 # TEMP Travis Testing
-echo "Collection Content:"
+echo "Collection Content Details:"
 ls -lh /root/ansible-fact/os_facts/tests/collections/ansible_collections/ansible_fact/os_facts
 ls -alh /root/ansible-fact/os_facts/tests/collections/ansible_collections/ansible_fact/os_facts/
 echo

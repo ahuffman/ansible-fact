@@ -31,7 +31,10 @@
   collections:
     - "ansible_fact.os_facts"
   tasks:
-    - name: "Include testing roles"
+    # - name: "Include testing roles"
+    #   include_role:
+    #     name: "{{ item | basename }}"
+    #   with_items: "{{ testing_roles }}"
+    - name: "test adjacent role for collection modules"
       include_role:
-        name: "{{ item | basename }}"
-      with_items: "{{ testing_roles }}"
+        name: "test_cron_facts"

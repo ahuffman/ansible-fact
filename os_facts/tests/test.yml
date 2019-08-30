@@ -10,7 +10,7 @@
     - name: "Locate test roles"
       find:
         paths:
-          - "roles"
+          - "./roles"
         recurse: False
         file_type: "directory"
       register: "test_roles"

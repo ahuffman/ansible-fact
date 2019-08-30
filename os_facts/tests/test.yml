@@ -10,7 +10,7 @@
     - name: "Locate test roles"
       find:
         paths:
-          - "../roles"
+          - "roles"
         recurse: False
         file_type: "directory"
       register: "test_roles"
@@ -31,10 +31,7 @@
   collections:
     - "ansible_fact.os_facts"
   tasks:
-    # - name: "Include testing roles"
-    #   include_role:
-    #     name: "{{ item | basename }}"
-    #   with_items: "{{ testing_roles }}"
-    - name: "test adjacent role for collection modules"
+    - name: "Include testing roles"
       include_role:
-        name: "/root/ansible-fact/os_facts/tests/roles/test_cron_facts"
+        name: "{{ item | basename }}"
+      with_items: "{{ testing_roles }}"

@@ -1,7 +1,0 @@
----
-- name: "cleanup"
-  # This has to be a command to actually remove this
-  command: "rm -f {{ no_permissions_file }}"
-  args:
-    warn: false
-    removes: "{{ no_permissions_file }}"

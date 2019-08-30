@@ -4,7 +4,7 @@ echo "Running on Ansible version:"
 ansible --version
 echo "------------------------------------------"
 echo
-echo "Ansible Configuration:"
+echo "Ansible Configuration (only changed):"
 ansible-config dump --only-changed
 echo "------------------------------------------"
 echo

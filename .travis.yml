@@ -17,11 +17,6 @@ before_script:
   # fire up the containers
   - docker run -it --name bullseye -d -v `pwd`/ansible-fact:/root/ansible-fact:z debian:bullseye /bin/bash
   - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/root/ansible-fact:z centos:centos7 /bin/bash
-  # get container info
-  - echo "Debian Bullseye container info:"
-  - docker inspect bullseye
-  - echo "CentOS7 container info:"
-  - docker inspect centos7
   # install what we need on containers
   #- docker exec -it bullseye apt-get install
   - docker exec -it centos7 yum install -y epel-release centos-release-scl
@@ -29,6 +24,11 @@ before_script:
 # for testing 3.x python (need to move this somewhere else later - let's get basics working 1st)
 #  - scl enable rh-python36 bash && yum install -y ansible
 script:
+  # get container info
+  - echo "Debian Bullseye container info:"
+  - docker inspect bullseye
+  - echo "CentOS7 container info:"
+  - docker inspect centos7
   # Ubuntu VM Stuff
   - ansible --version
   # Run tests on Debian Bullseye

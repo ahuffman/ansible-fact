@@ -8,7 +8,7 @@ services:
 install: skip
 before_script:
   # prep Ubuntu VM
-  - pip install ansible
+  - pip install ansible jmespath
   # prep containers
   - docker pull debian:bullseye
   - docker pull centos:centos7
@@ -21,7 +21,7 @@ before_script:
   ## Debian Bullseye:
   - docker exec -it bullseye apt-get update
   - docker exec -it bullseye apt-get install -y python-pip
-  - docker exec -it bullseye pip install ansible
+  - docker exec -it bullseye pip install ansible jmespath
   - docker exec -it bullseye /bin/bash -c 'export PATH=$PATH:/usr/local/bin'
   ## CentOS7:
   - docker exec -it centos7 yum install -y epel-release centos-release-scl

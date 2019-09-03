@@ -31,7 +31,7 @@ before_script:
 #  - scl enable rh-python36 bash && yum install -y ansible
 script:
   # Ubuntu VM Stuff
-  - #ansible --version
+  - ansible --version
   # Run tests on Debian Bullseye
   # Run tests on CentOS7
   - docker exec -it centos7 /root/ansible-fact/os_facts/tests/travis-script.sh

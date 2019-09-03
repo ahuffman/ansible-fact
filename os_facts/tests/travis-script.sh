@@ -12,15 +12,15 @@ echo
 
 # TEMP Travis Testing
 echo "Collection Content Details:"
-ls -lh /root/ansible-fact/os_facts/tests/collections/ansible_collections/ansible_fact/os_facts
-ls -alh /root/ansible-fact/os_facts/tests/collections/ansible_collections/ansible_fact/os_facts/
+ls -lh /home/travis/build/ahuffman/ansible-fact/os_facts/tests/collections/ansible_collections/ansible_fact/os_facts
+ls -alh /home/travis/build/ahuffman/ansible-fact/os_facts/tests/collections/ansible_collections/ansible_fact/os_facts/
 echo
 echo
 
-cd /root/ansible-fact/os_facts/tests/
+cd /home/travis/build/ahuffman/ansible-fact/os_facts/tests/
 # display working dir
 pwd
 echo
 echo "Launching Test Playbook"
 
-ansible-playbook test.yml -vvv
+ansible-playbook test.yml

@@ -27,4 +27,5 @@ before_script:
 # for testing 3.x python (need to move this somewhere else later - let's get basics working 1st)
 #  - scl enable rh-python36 bash && yum install -y ansible
 script:
+  - ansible --version
   - docker exec -it centos7 /root/ansible-fact/os_facts/tests/travis-script.sh

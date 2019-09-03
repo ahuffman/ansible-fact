@@ -22,7 +22,7 @@ before_script:
   - docker exec -it bullseye apt-get update
   - docker exec -it bullseye apt-get install -y python-pip
   - docker exec -it bullseye pip install ansible
-  - docker exec -it bullseye export PATH=$PATH:/usr/local/bin
+  - docker exec -it bullseye 'export PATH=$PATH:/usr/local/bin'
   ## CentOS7:
   - docker exec -it centos7 yum install -y epel-release centos-release-scl
   - docker exec -it centos7 yum install -y ansible # scl-utils rh-python36-python

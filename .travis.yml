@@ -29,17 +29,19 @@ before_script:
 # for testing 3.x python (need to move this somewhere else later - let's get basics working 1st)
 #  - scl enable rh-python36 bash && yum install -y ansible
 script:
-  # get container info
-  - echo "Debian Bullseye container info:"
-  - docker inspect bullseye
-  - echo "CentOS7 container info:"
-  - docker inspect centos7
   # Run tests on Ubuntu VM
+  - echo "Ubuntu VM info:"
+  - cat /etc/os-release
+  - uname -a
   - echo "Test Ubuntu:"
   - /home/travis/build/ahuffman/ansible-fact/os_facts/tests/travis-script.sh
   # Run tests on Debian Bullseye
+  - echo "Debian Bullseye container info:"
+  - docker inspect bullseye
   - echo "Test Debian Bullseye:"
   - docker exec -it bullseye /home/travis/build/ahuffman/ansible-fact/os_facts/tests/travis-script.sh
   # Run tests on CentOS7
+  - echo "CentOS7 container info:"
+  - docker inspect centos7
   - echo "Test CentOS7:"
   - docker exec -it centos7 /home/travis/build/ahuffman/ansible-fact/os_facts/tests/travis-script.sh

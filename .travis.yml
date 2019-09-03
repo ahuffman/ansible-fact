@@ -7,14 +7,21 @@ services:
 
 install: skip
 before_script:
+  # prep Ubuntu VM
+  - apt-get install ansible
+  # prep containers
+  - docker pull debian:bullseye
   - docker pull centos:centos7
   - cd ../
   - pwd
-  # fire up the container
+  # fire up the containers
+  - docker run -it --name bullseye -d -v `pwd`/ansible-fact:/root/ansible-fact debian:bullseye /bin/bash
   - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/root/ansible-fact centos:centos7 /bin/bash
   # get container info
+  - docker inspect bullseye
   - docker inspect centos7
-  # install what we need
+  # install what we need on containers
+  #- docker exec -it bullseye apt-get install
   - docker exec -it centos7 yum install -y epel-release centos-release-scl
   - docker exec -it centos7 yum install -y ansible # scl-utils rh-python36-python
 # for testing 3.x python (need to move this somewhere else later - let's get basics working 1st)

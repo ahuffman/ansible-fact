@@ -38,6 +38,7 @@ script:
   # Run tests on Debian Bullseye
   - echo "Debian Bullseye container info:"
   - docker inspect bullseye
+  - echo $PATH
   - echo "Test Debian Bullseye:"
   - docker exec -it bullseye /home/travis/build/ahuffman/ansible-fact/os_facts/tests/travis-script.sh
   # Run tests on CentOS7

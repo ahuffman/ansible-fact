@@ -8,8 +8,7 @@ services:
 install: skip
 before_script:
   # prep Ubuntu VM
-  - sudo apt-get update
-  - sudo apt-get install ansible
+  - pip install ansible
   # prep containers
   - docker pull debian:bullseye
   - docker pull centos:centos7

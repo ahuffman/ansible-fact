@@ -30,6 +30,8 @@ script:
   - echo "CentOS7 container info:"
   - docker inspect centos7
   # Ubuntu VM Stuff
+  - pwd
+  - ls -lh
   - ansible --version
   # Run tests on Debian Bullseye
   # Run tests on CentOS7

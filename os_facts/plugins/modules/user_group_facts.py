@@ -113,8 +113,8 @@ class UserGroupGatherer(FactGatherer):
                 user['home'] = fields[5]
                 user['shell'] = fields[6]
                 users.append(user)
-            elif len(fields) > 1 or fields[0] != '':
-                self.fail_json(msg="Failed to parse line {} in {}".format(line_number, self.passwd_path))
+            # elif len(fields) > 1 or fields[0] != '':
+            #     self.fail_json(msg="Failed to parse line {} in {}".format(line_number, self.passwd_path))
         return users
 
     def get_shadow(self):

@@ -76,6 +76,7 @@ local_groups:
 
 from ansible_collections.ansible_fact.os_facts.plugins.module_utils.fact_gatherer import FactGatherer
 from os.path import isfile
+import os
 
 class UserGroupGatherer(FactGatherer):
     def read_lines(self, file_name):

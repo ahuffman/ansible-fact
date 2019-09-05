@@ -33,13 +33,13 @@
     - name: "Load the test_1 crontab"
       cron_facts:
         cron_files:
-          - "tests/roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1"
+          - "roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1"
 
     - debug:
         msg:
           - "Here are the assertion values we are going to look at:"
           - "{{ cron.files | length() }} == 1"
-          - "{{ cron.files[0]['path'] }} == 'tests/roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1'"
+          - "{{ cron.files[0]['path'] }} == 'roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1'"
           - "{{ cron.files[0]['permissions'] }} == '0644'"
           - "'user' in {{ cron.files[0] }}"
           - "'group' in {{ cron.files[0] }}"
@@ -52,7 +52,7 @@
       assert:
         that:
           - "cron.files | length() == 1"
-          - "cron.files[0]['path'] == 'tests/roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1'"
+          - "cron.files[0]['path'] == 'roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1'"
           - "cron.files[0]['permissions'] == '0644'"
           - "'user' in cron.files[0]"
           - "'group' in cron.files[0]"

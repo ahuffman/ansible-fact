@@ -15,8 +15,8 @@ before_script:
   - cd ../
   - pwd
   # fire up the containers
-  - docker run -it --name bullseye -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z:defaults debian:bullseye /bin/bash
-  - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z:defaults centos:centos7 /bin/bash
+  - docker run -it --name bullseye -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z debian:bullseye /bin/bash
+  - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z centos:centos7 /bin/bash
   # install what we need on containers
   ## Debian Bullseye:
   - docker exec -it bullseye apt-get update

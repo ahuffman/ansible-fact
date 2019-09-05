@@ -23,7 +23,7 @@
 
     - name: "Set the permissions to 644 for assertion"
       file:
-        path: "tests/roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1"
+        path: "roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1"
         mode: "0644"
         state: "touch"
 

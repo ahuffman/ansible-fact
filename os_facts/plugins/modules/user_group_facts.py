@@ -209,7 +209,7 @@ class UserGroupGatherer(FactGatherer):
             for item_2 in adding_dict:
               if item_2[merge_key] == item[merge_key]:
                   # NOTE: This will technically actually change item in starting_dict
-                  item.update(item2)
+                  item.update(item_2)
             merged_items.append(item)
         return merged_items
 

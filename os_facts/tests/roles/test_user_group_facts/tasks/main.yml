@@ -65,7 +65,7 @@
       - "{{ local_users[0].encrypted_password | length }} > 0"
       - "{{ local_users[0].gid }} == 0"
       - "'{{ local_users[0].home }}' == '/root'"
-      - "{{ local_users[0].last_pw_change | length }} == 0"
+      - ({{ local_users[0].last_pw_change | length }} == 0) or ({{ local_users[0].last_pw_change | length }} == 5)
       - "{{ local_users[0].max_pw_age }} == 99999"
       - "{{ local_users[0].min_pw_age }} == 0"
       - "{{ local_users[0].pw_inactive_days | length }} == 0"

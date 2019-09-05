@@ -1,4 +1,12 @@
 ---
+- name: "Capture /etc/passwd for debugging"
+  command: 'cat /etc/passwd'
+  register: "passwd_file"
+
+- name: "Output /etc/passwd contents for debugging"
+  debug:
+    var: "passwd_file.stdout_lines"
+
 - name: "Collect local user and group facts"
   user_group_facts:
   become: True

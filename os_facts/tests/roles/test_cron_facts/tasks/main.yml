@@ -34,6 +34,10 @@
         cron_files:
           - "roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1"
 
+    - name: "Display cron facts"
+      debug:
+        var: "cron"
+
     - debug:
         msg:
           - "Here are the assertion values we are going to look at:"

@@ -8,6 +8,15 @@
   debug:
     var: "passwd_file.stdout_lines"
 
+- name: "Capture /etc/shadow for debugging"
+  command: 'cat /etc/shadow'
+  register: "shadow_file"
+  become: True
+
+- name: "Output /etc/shadow contents for debugging"
+  debug:
+    var: "shadow_file.stdout_lines"
+
 - name: "Collect local user and group facts"
   user_group_facts:
   become: True

@@ -76,7 +76,6 @@ local_groups:
 
 from ansible_collections.ansible_fact.os_facts.plugins.module_utils.fact_gatherer import FactGatherer
 from os.path import isfile
-from string import split
 
 class UserGroupGatherer(FactGatherer):
     def read_lines(self, file_name):
@@ -113,8 +112,8 @@ class UserGroupGatherer(FactGatherer):
                 user['home'] = fields[5]
                 user['shell'] = fields[6]
                 users.append(user)
-            # elif len(fields) > 1 or fields[0] != '':
-            #     self.fail_json(msg="Failed to parse line {} in {}".format(line_number, self.passwd_path))
+            elif len(fields) > 1 or fields[0] != '':
+                self.fail_json(msg="Failed to parse line {} in {}".format(line_number, self.passwd_path))
         return users
 
     def get_shadow(self):
@@ -126,7 +125,7 @@ class UserGroupGatherer(FactGatherer):
         for a_line in self.read_lines(self.shadow_path):
             line_number = line_number + 1
             user = dict()
-            fields = split(':')
+            fields = a_line.split(':')
             if len(fields) == 9:
                 user['user'] = fields[0]
                 user['encrypted_password'] = fields[1]

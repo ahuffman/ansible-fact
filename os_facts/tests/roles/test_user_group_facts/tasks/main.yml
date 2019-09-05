@@ -2,6 +2,7 @@
 - name: "Capture /etc/passwd for debugging"
   command: 'cat /etc/passwd'
   register: "passwd_file"
+  become: True
 
 - name: "Output /etc/passwd contents for debugging"
   debug:

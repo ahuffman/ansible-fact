@@ -15,6 +15,9 @@
       ignore_errors: True
       register: "read_failure"
 
+    - debug:
+        var: "read_failure"
+
     - assert:
         that:
           - "read_failure is failed"

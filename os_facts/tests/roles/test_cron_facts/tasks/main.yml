@@ -22,7 +22,6 @@
         that:
           - "read_failure is failed"
           - "'Permission denied' in read_failure.msg"
-      ignore_errors: True
 
     - name: "Set the permissions to 644 for assertion"
       file:

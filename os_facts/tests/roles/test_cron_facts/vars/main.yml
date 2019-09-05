@@ -8,3 +8,4 @@ cron_files:
   - "roles/test_cron_facts/files/crontabs/etc/cron.d/0hourly.rhel8"
   - "roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1"
 no_permissions_file: "roles/test_cron_facts/files/crontabs/no_permissions"
+cron_file: "roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1"

@@ -25,14 +25,14 @@
 
     - name: "Set the permissions to 644 for assertion"
       file:
-        path: "roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1"
+        path: "{{ cron_file }}"
         mode: "0644"
         state: "touch"
 
     - name: "Load the test_1 crontab"
       cron_facts:
         cron_files:
-          - "roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1"
+          - "{{ cron_file }}"
 
     - name: "Display cron facts"
       debug:
@@ -42,7 +42,7 @@
         msg:
           - "Here are the assertion values we are going to look at:"
           - "{{ cron.files | length() }} == 1"
-          - "{{ cron.files[0]['path'] }} == 'roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1'"
+          - "{{ cron.files[0]['path'] }} == '{{ cron_file }}'"
           - "{{ cron.files[0]['permissions'] }} == '0644'"
           - "'user' in {{ cron.files[0] }}"
           - "'group' in {{ cron.files[0] }}"
@@ -55,7 +55,7 @@
       assert:
         that:
           - "cron.files | length() == 1"
-          - "cron.files[0]['path'] == 'roles/test_cron_facts/files/crontabs/var/spool/cron/root/test_1'"
+          - "cron.files[0]['path'] == '{{ cron_file }}'"
           - "cron.files[0]['permissions'] == '0644'"
           - "'user' in cron.files[0]"
           - "'group' in cron.files[0]"

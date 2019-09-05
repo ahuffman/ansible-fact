@@ -50,7 +50,9 @@
       - "'{{ local_users[0].user }}' == 'root'"
       - "{{ local_groups | length }} > 1"
       - "{{ local_groups[0].administrators | length }} == 0"
-      - "{{ local_groups[0].encrypted_password | length }} == 0"
+      # On Debian flavors, they have a '*' in the encrypted_password instead of nothing as in EL.
+      ##  This does affectively the same thing, but we need to have a valid test for each implementation
+      - "({{ local_groups[0].encrypted_password | length }} == 0) or ({{ local_groups[0].encrypted_password | length }} == 1)"
       - "{{ local_groups[0].gid }} == 0"
       - "'{{ local_groups[0].group | quote }}' == 'root'"
       - "{{ local_groups[0].gshadow | bool }} is True"
@@ -77,7 +79,9 @@
       - "'{{ local_users[0].user }}' == 'root'"
       - "{{ local_groups | length }} > 1"
       - "{{ local_groups[0].administrators | length }} == 0"
-      - "{{ local_groups[0].encrypted_password | length }} == 0"
+      # On Debian flavors, they have a '*' in the encrypted_password instead of nothing, or '' as in EL.
+      ##  This does affectively the same thing, but we need to have a valid test for each implementation
+      - "({{ local_groups[0].encrypted_password | length }} == 0) or ({{ local_groups[0].encrypted_password | length }} == 1)"
       - "{{ local_groups[0].gid }} == 0"
       - "'{{ local_groups[0].group | quote }}' == 'root'"
       - "{{ local_groups[0].gshadow | bool }}"

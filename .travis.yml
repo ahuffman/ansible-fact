@@ -9,6 +9,8 @@ install: skip
 before_script:
   # prep Ubuntu VM
   - pip install ansible jmespath
+  - apt-get update
+  - apt-get install -y acl
   # prep containers
   - docker pull debian:bullseye
   - docker pull centos:centos7
@@ -20,7 +22,7 @@ before_script:
   # install what we need on containers
   ## Debian Bullseye:
   - docker exec -it bullseye apt-get update
-  - docker exec -it bullseye apt-get install -y python-pip
+  - docker exec -it bullseye apt-get install -y python-pip acl
   - docker exec -it bullseye pip install ansible jmespath
   - docker exec -it bullseye /bin/bash -c 'export PATH=$PATH:/usr/local/bin'
   ## CentOS7:
@@ -40,12 +42,12 @@ script:
   - echo "Debian Bullseye container info:"
   - docker inspect bullseye
   - docker exec -it bullseye /bin/bash -c 'echo $PATH'
-  - docker exec -it bullseye getfacl /home/travis/build/ahuffman/ansible-fact/os_facts/tests/roles/test_cron_facts/files/crontabs
+  - docker exec -it bullseye /bin/bash -c 'getfacl /home/travis/build/ahuffman/ansible-fact/os_facts/tests/roles/test_cron_facts/files/crontabs'
   - echo "Test Debian Bullseye:"
   - docker exec -it bullseye /home/travis/build/ahuffman/ansible-fact/os_facts/tests/travis-script.sh
   # Run tests on CentOS7
   - echo "CentOS7 container info:"
   - docker inspect centos7
-  - docker exec -it bullseye getfacl /home/travis/build/ahuffman/ansible-fact/os_facts/tests/roles/test_cron_facts/files/crontabs
+  - docker exec -it bullseye /bin/bash -c 'getfacl /home/travis/build/ahuffman/ansible-fact/os_facts/tests/roles/test_cron_facts/files/crontabs'
   - echo "Test CentOS7:"
   - docker exec -it centos7 /home/travis/build/ahuffman/ansible-fact/os_facts/tests/travis-script.sh

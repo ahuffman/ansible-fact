@@ -12,7 +12,7 @@ before_script:
   - sudo apt-get update
   - sudo apt-get install -y acl
   ### ensure root owns as there is no travis user/group in containers (uid:2000)
-  - sudo chown -R root.root `pwd`/ansible-fact
+  - sudo chown -R root.root ../ansible-fact
   # prep containers
   - docker pull debian:bullseye
   - docker pull centos:centos7

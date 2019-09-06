@@ -11,6 +11,8 @@ before_script:
   - pip install ansible jmespath
   - sudo apt-get update
   - sudo apt-get install -y acl
+  ### ensure root owns as there is no travis user/group in containers (uid:2000)
+  - sudo chown -R root.root `pwd`/ansible-fact
   # prep containers
   - docker pull debian:bullseye
   - docker pull centos:centos7

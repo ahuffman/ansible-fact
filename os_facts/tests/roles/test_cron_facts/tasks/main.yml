@@ -7,6 +7,7 @@
         mode: "000"
         state: "touch"
       notify: "cleanup"
+      become: True
 
     - name: "Attempt to load a file with no permissions"
       cron_facts:
@@ -28,6 +29,7 @@
         path: "{{ cron_file }}"
         mode: "0644"
         state: "touch"
+      become: True
 
     - name: "Load the test_1 crontab"
       cron_facts:

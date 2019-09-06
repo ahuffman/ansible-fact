@@ -9,8 +9,8 @@ install: skip
 before_script:
   # prep Ubuntu VM
   - pip install ansible jmespath
-  - apt-get update
-  - apt-get install -y acl
+  - sudo apt-get update
+  - sudo apt-get install -y acl
   # prep containers
   - docker pull debian:bullseye
   - docker pull centos:centos7

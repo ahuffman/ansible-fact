@@ -14,21 +14,23 @@ before_script:
   ### ensure root owns as there is no travis user/group in containers (uid:2000)
   - sudo chown -R root.root ../ansible-fact
   # prep containers
-  - docker pull debian:bullseye
+  # - docker pull debian:bullseye
+  - docker pull ahuffman/afbullseye:latest
   # - docker pull centos:centos7
-  - docker pull ahuffman/afcentos7
+  - docker pull ahuffman/afcentos7:latest
   - cd ../
   - pwd
   # fire up the containers
-  - docker run -it --name bullseye -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z debian:bullseye /bin/bash
+  # - docker run -it --name bullseye -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z debian:bullseye /bin/bash
+  - docker run -it --name bullseye -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z ahuffman/afbullseye:latest /bin/bash
   # - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z centos:centos7 /bin/bash
-  - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z ahuffman/afcentos7 /bin/bash
+  - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z ahuffman/afcentos7:latest /bin/bash
   # install what we need on containers
   ## Debian Bullseye:
-  - docker exec -it bullseye apt-get update
-  - docker exec -it bullseye apt-get install -y python-pip acl
-  - docker exec -it bullseye pip install ansible jmespath
-  - docker exec -it bullseye /bin/bash -c 'export PATH=$PATH:/usr/local/bin'
+  # - docker exec -it bullseye apt-get update
+  # - docker exec -it bullseye apt-get install -y python-pip acl
+  # - docker exec -it bullseye pip install ansible jmespath
+  # - docker exec -it bullseye /bin/bash -c 'export PATH=$PATH:/usr/local/bin'
   ## CentOS7:
   # - docker exec -it centos7 yum install -y epel-release centos-release-scl
   # - docker exec -it centos7 yum install -y ansible # scl-utils rh-python36-python

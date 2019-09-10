@@ -14,28 +14,14 @@ before_script:
   ### ensure root owns as there is no travis user/group in containers (uid:2000)
   - sudo chown -R root.root ../ansible-fact
   # prep containers
-  # - docker pull debian:bullseye
   - docker pull ahuffman/afbullseye:latest
-  # - docker pull centos:centos7
   - docker pull ahuffman/afcentos7:latest
   - cd ../
   - pwd
-  # fire up the containers
-  # - docker run -it --name bullseye -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z debian:bullseye /bin/bash
+  # fire up the pre-built testing Ansible containers
   - docker run -it --name bullseye -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z ahuffman/afbullseye:latest /bin/bash
-  # - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z centos:centos7 /bin/bash
   - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z ahuffman/afcentos7:latest /bin/bash
-  # install what we need on containers
-  ## Debian Bullseye:
-  # - docker exec -it bullseye apt-get update
-  # - docker exec -it bullseye apt-get install -y python-pip acl
-  # - docker exec -it bullseye pip install ansible jmespath
-  # - docker exec -it bullseye /bin/bash -c 'export PATH=$PATH:/usr/local/bin'
-  ## CentOS7:
-  # - docker exec -it centos7 yum install -y epel-release centos-release-scl
-  # - docker exec -it centos7 yum install -y ansible # scl-utils rh-python36-python
-# for testing 3.x python (need to move this somewhere else later - let's get basics working 1st)
-#  - scl enable rh-python36 bash && yum install -y ansible
+
 script:
   # Run tests on Ubuntu VM
   - echo "Ubuntu VM info:"
@@ -47,13 +33,15 @@ script:
   # Run tests on Debian Bullseye
   - echo "Debian Bullseye container info:"
   - docker inspect bullseye
-  - docker exec -it bullseye /bin/bash -c 'echo $PATH'
+  # - docker exec -it bullseye /bin/bash -c 'echo $PATH'
+  - docker exec -it bullseye /bin/bash -c 'getenforce'
   - docker exec -it bullseye /bin/bash -c 'getfacl /home/travis/build/ahuffman/ansible-fact/os_facts/tests/roles/test_cron_facts/files/crontabs'
   - echo "Test Debian Bullseye:"
   - docker exec -it bullseye /home/travis/build/ahuffman/ansible-fact/os_facts/tests/travis-script.sh
   # Run tests on CentOS7
   - echo "CentOS7 container info:"
   - docker inspect centos7
-  - docker exec -it bullseye /bin/bash -c 'getfacl /home/travis/build/ahuffman/ansible-fact/os_facts/tests/roles/test_cron_facts/files/crontabs'
+  - docker exec -it centos7 /bin/bash -c 'getenforce'
+  - docker exec -it centos7 /bin/bash -c 'getfacl /home/travis/build/ahuffman/ansible-fact/os_facts/tests/roles/test_cron_facts/files/crontabs'
   - echo "Test CentOS7:"
   - docker exec -it centos7 /home/travis/build/ahuffman/ansible-fact/os_facts/tests/travis-script.sh

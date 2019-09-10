@@ -15,12 +15,14 @@ before_script:
   - sudo chown -R root.root ../ansible-fact
   # prep containers
   - docker pull debian:bullseye
-  - docker pull centos:centos7
+  # - docker pull centos:centos7
+  - docker pull ahuffman/afcentos7
   - cd ../
   - pwd
   # fire up the containers
   - docker run -it --name bullseye -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z debian:bullseye /bin/bash
-  - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z centos:centos7 /bin/bash
+  # - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z centos:centos7 /bin/bash
+  - docker run -it --name centos7 -d -v `pwd`/ansible-fact:/home/travis/build/ahuffman/ansible-fact:z ahuffman/afcentos7 /bin/bash
   # install what we need on containers
   ## Debian Bullseye:
   - docker exec -it bullseye apt-get update
@@ -28,8 +30,8 @@ before_script:
   - docker exec -it bullseye pip install ansible jmespath
   - docker exec -it bullseye /bin/bash -c 'export PATH=$PATH:/usr/local/bin'
   ## CentOS7:
-  - docker exec -it centos7 yum install -y epel-release centos-release-scl
-  - docker exec -it centos7 yum install -y ansible # scl-utils rh-python36-python
+  # - docker exec -it centos7 yum install -y epel-release centos-release-scl
+  # - docker exec -it centos7 yum install -y ansible # scl-utils rh-python36-python
 # for testing 3.x python (need to move this somewhere else later - let's get basics working 1st)
 #  - scl enable rh-python36 bash && yum install -y ansible
 script:

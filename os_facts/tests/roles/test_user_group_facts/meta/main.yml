@@ -1,0 +1,3 @@
+---
+collections:
+  - "ansible_fact.os_facts"

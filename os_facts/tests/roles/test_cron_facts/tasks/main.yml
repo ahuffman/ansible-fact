@@ -36,6 +36,7 @@
       cron_facts:
         cron_files:
           - "{{ cron_file }}"
+      become: True
 
     - name: "Display cron facts"
       debug:

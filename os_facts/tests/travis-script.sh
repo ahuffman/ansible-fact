@@ -5,7 +5,7 @@ run_tests () {
   # argument 1 is container name
   # if argument 1 is not passed run as a normal script
   ## Otherwise put the docker exec command in front of everything
-  if [ -n $1 ]
+  if [ $1 ]
   then
     DOCKER_CMD="docker exec -it $1 /bin/bash -c"
     echo Container Information for $1:
@@ -14,7 +14,7 @@ run_tests () {
     echo Virtual Machine Information for Ubuntu:
   fi
   # Spit out our test platform info
-  if [ -n $1 ]
+  if [ $1 ]
   then
     echo $1 Container Configuration:
     docker inspect $1

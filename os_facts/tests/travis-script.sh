@@ -65,9 +65,10 @@ collect_results () {
 
 # Execute Tests
 ## Ubuntu VM
-UBUNTU=`run_tests`
-CENTOS7=`run_tests centos7`
-DEBIAN=`run_tests bullseye`
-
+# UBUNTU=`run_tests`
+# CENTOS7=`run_tests centos7`
+# DEBIAN=`run_tests bullseye`
+run_tests
+run_tests centos7
 # Return Test results to Travis
-collect_results
+# collect_results

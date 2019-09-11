@@ -1,5 +1,6 @@
 #! /bin/bash
 run_tests() {
+  # set this to non-zero so we don't get false positives from builds
   PLAYRESULT=1
   # Test run function
   # argument 1 is container name

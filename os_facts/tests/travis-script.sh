@@ -1,10 +1,15 @@
 #! /bin/bash
+UBUNTU=""
+CENTOS7=""
+DEBIAN=""
 
 run_tests () {
+  PLAYRESULT=1
   # Test run function
   # argument 1 is container name
   # if argument 1 is not passed run as a normal script
   ## Otherwise put the docker exec command in front of everything
+  # Returns PLAYRESULT
   if [ ! -z "$1" ]
   then
     DOCKER_CMD="docker exec -it -u travis $1 /bin/bash -c"
@@ -40,8 +45,19 @@ run_tests () {
   $DOCKER_CMD 'echo'
   $DOCKER_CMD 'echo'
   $DOCKER_CMD 'echo Launching Test Playbook'
-  $DOCKER_CMD 'cd /home/travis/build/ahuffman/ansible-fact/os_facts/tests/;pwd;echo;ansible-playbook test.yml -u travis; PLAYRESULT=$?'
-  $DOCKER_CMD 'if [ $PLAYRESULT -eq 0 ]; then echo The tests passed.; echo 0; else echo The tests failed.; echo 5; fi'
+  $DOCKER_CMD 'cd /home/travis/build/ahuffman/ansible-fact/os_facts/tests/;pwd;echo;ansible-playbook test.yml -u travis;'
+  PLAYRESULT=$?
+}
+
+set_result () {
+  if [ $PLAYRESULT -eq 0 ]
+  then
+    echo The tests passed.
+    return 0
+  else
+    echo The tests failed.
+    return 5
+  fi
 }
 
 collect_results () {
@@ -62,11 +78,10 @@ collect_results () {
 
 # Execute Tests
 ## Ubuntu VM
-# UBUNTU=`run_tests`
-# CENTOS7=`run_tests centos7`
-# DEBIAN=`run_tests bullseye`
+
 run_tests
-run_tests centos7
-run_tests bullseye
+echo $PLAYRESULT
+# run_tests centos7
+# run_tests bullseye
 # Return Test results to Travis
 # collect_results

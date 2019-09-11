@@ -1,4 +1,6 @@
 #! /bin/bash
+# This script will exit 5 if any platform tests fail
+
 run_tests() {
   # set this to non-zero so we don't get false positives from builds
   PLAYRESULT=1
@@ -44,11 +46,10 @@ run_tests() {
   $DOCKER_CMD 'echo Launching Test Playbook'
   $DOCKER_CMD 'cd /home/travis/build/ahuffman/ansible-fact/os_facts/tests/;pwd;echo;ansible-playbook test.yml -u travis;'
   PLAYRESULT=$?
-  echo $PLAYRESULT
 }
 
 set_result() {
-  if [ $1 -eq 0 ]
+  if [ $PLAYRESULT -eq 0 ]
   then
     echo 0
   else
@@ -60,13 +61,19 @@ collect_results () {
   if [ $UBUNTU -ne 0 ] || [ $CENTOS7 -ne 0 ] || [ $DEBIAN -ne 0 ]
   then
     # bad bad test
+    echo
+    echo
     echo Some tests failed:
-    echo Ubuntu Result: $UBUNTU
-    echo CentOS7 Result: $CENTOS7
-    echo Debian Result: $DEBIAN
+    echo ' _____________________'
+    echo '| Platform | Exit Code |'
+    echo '|  Ubuntu  |     $UBUNTU     |'
+    echo '|  CentOS7 |     $CENTOS7     |'
+    echo '|  Debian  |     $DEBIAN     |'
     exit 5
   else
     # very good, very very good
+    echo
+    echo
     echo All tests passed!
     exit 0
   fi
@@ -75,13 +82,13 @@ collect_results () {
 # Execute Tests
 ## Ubuntu VM
 run_tests
-UBUNTU=`set_result $PLAYRESULT`
+UBUNTU=`set_result`
 ## CentOS7 Container
 run_tests centos7
-CENTOS7=`set_result $PLAYRESULT`
+CENTOS7=`set_result`
 ## Debian Bullseye Container
 run_tests bullseye
-DEBIAN=`set_result $PLAYRESULT`
+DEBIAN=`set_result`
 
 # Return Test results and exit to Travis
 collect_results

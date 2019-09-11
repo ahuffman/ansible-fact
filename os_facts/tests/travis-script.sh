@@ -66,9 +66,9 @@ collect_results () {
     echo Some tests failed:
     echo ' _____________________'
     echo '| Platform | Exit Code |'
-    echo '|  Ubuntu  |     $UBUNTU     |'
-    echo '|  CentOS7 |     $CENTOS7     |'
-    echo '|  Debian  |     $DEBIAN     |'
+    echo "|  Ubuntu  |     $UBUNTU     |"
+    echo "|  CentOS7 |     $CENTOS7     |"
+    echo "|  Debian  |     $DEBIAN     |"
     exit 5
   else
     # very good, very very good

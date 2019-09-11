@@ -15,6 +15,7 @@
           - "{{ no_permissions_file }}"
       ignore_errors: True
       register: "read_failure"
+      become: True
 
     - debug:
         var: "read_failure"

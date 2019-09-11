@@ -5,7 +5,7 @@ run_tests () {
   # argument 1 is container name
   # if argument 1 is not passed run as a normal script
   ## Otherwise put the docker exec command in front of everything
-  if [ $1 ]
+  if [ ! -z "$1" ]
   then
     DOCKER_CMD="docker exec -it $1 /bin/bash -c"
     echo Container Information for $1:
@@ -14,7 +14,7 @@ run_tests () {
     echo Virtual Machine Information for Ubuntu:
   fi
   # Spit out our test platform info
-  if [ $1 ]
+  if [ ! -z "$1" ]
   then
     echo $1 Container Configuration:
     docker inspect $1
@@ -39,11 +39,8 @@ run_tests () {
   $DOCKER_CMD 'ls -alh /home/travis/build/ahuffman/ansible-fact/os_facts/tests/collections/ansible_collections/ansible_fact/os_facts/'
   $DOCKER_CMD 'echo'
   $DOCKER_CMD 'echo'
-  $DOCKER_CMD 'cd /home/travis/build/ahuffman/ansible-fact/os_facts/tests/'
-  $DOCKER_CMD 'pwd'
-  $DOCKER_CMD 'echo'
   $DOCKER_CMD 'echo Launching Test Playbook'
-  $DOCKER_CMD 'ansible-playbook test.yml; PLAYRESULT=$?'
+  $DOCKER_CMD 'cd /home/travis/build/ahuffman/ansible-fact/os_facts/tests/;pwd;echo;ansible-playbook test.yml; PLAYRESULT=$?'
   $DOCKER_CMD 'if [ $PLAYRESULT -ne 0 ]; then echo The tests failed.; return 5; else echo The tests passed.; return 0; fi'
 }
 

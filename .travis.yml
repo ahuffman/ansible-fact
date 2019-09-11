@@ -9,8 +9,6 @@ install: skip
 before_script:
   # prep Ubuntu VM
   - pip install ansible jmespath
-  - sudo apt-get update
-  - sudo apt-get install -y acl
   ### ensure root owns as there is no travis user/group in containers (uid:2000)
   - sudo chown -R root.root ../ansible-fact
   # prep containers

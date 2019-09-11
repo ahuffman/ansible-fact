@@ -1,6 +1,6 @@
 #! /bin/bash
 
-run_test () {
+run_tests () {
   # Test run function
   # argument 1 is container name
   # if argument 1 is not passed run as a normal script
@@ -51,9 +51,14 @@ collect_results () {
   if [ $UBUNTU -ne 0 ] || [ $CENTOS7 -ne 0 ] || [ $DEBIAN -ne 0 ]
   then
     # bad bad test
+    echo Some tests failed:
+    echo Ubuntu Result: $UBUNTU
+    echo CentOS7 Result: $CENTOS7
+    echo Debian Result: $DEBIAN
     return 5
   else
     # very good, very very good
+    echo All tests passed!
     return 0
   fi
 }

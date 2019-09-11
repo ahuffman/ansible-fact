@@ -1,6 +1,10 @@
 ---
 - name: "cron_facts tests"
   block:
+    - name: "Output Ansible User"
+      debug:
+        var: "ansible_user"
+
     - name: "Create a sample file with no permissions"
       file:
         path: "{{ no_permissions_file }}"

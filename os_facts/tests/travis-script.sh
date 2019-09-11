@@ -6,9 +6,9 @@ run_tests() {
   PLAYRESULT=1
   # Test run function
   # argument 1 is container name
-  # if argument 1 is not passed run as a normal script
+  # if argument 1 is not passed run as a normal script locally with /bin/bash -c
   ## Otherwise put the docker exec command in front of everything
-  # Returns PLAYRESULT
+  # Returns variable PLAYRESULT
   if [ ! -z "$1" ]
   then
     DOCKER_CMD="docker exec -it -u travis $1 /bin/bash -c"

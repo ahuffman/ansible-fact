@@ -43,8 +43,19 @@ run_test () {
   $DOCKER_CMD 'pwd'
   $DOCKER_CMD 'echo'
   $DOCKER_CMD 'echo "Launching Test Playbook"'
-  $DOCKER_CMD 'ansible-playbook test.yml'
-  $DOCKER_CMD 'if [$? -ne 0]; then echo "The tests failed."; return 5; fi'
+  $DOCKER_CMD 'ansible-playbook test.yml; PLAYRESULT=$?'
+  $DOCKER_CMD 'if [ $PLAYRESULT -ne 0 ]; then echo "The tests failed."; return 5; else echo "The tests passed."; return 0; fi'
+}
+
+collect_results () {
+  if [ $UBUNTU -ne 0 ] || [ $CENTOS7 -ne 0 ] || [ $DEBIAN -ne 0 ]
+  then
+    # bad bad test
+    return 5
+  else
+    # very good, very very good
+    return 0
+  fi
 }
 
 # Execute Tests
@@ -53,12 +64,5 @@ UBUNTU=`run_tests`
 CENTOS7=`run_tests centos7`
 DEBIAN=`run_tests bullseye`
 
-# Return results
-if [$UBUNTU -eq 5] || [$CENTOS7 -eq 5] || [$DEBIAN -eq 5]
-then
-  # bad bad test
-  return 5
-else
-  # very good, very very good
-  return 0
-fi
+# Return Test results to Travis
+collect_results

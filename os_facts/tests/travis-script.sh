@@ -44,11 +44,7 @@ run_test () {
   $DOCKER_CMD 'echo'
   $DOCKER_CMD 'echo "Launching Test Playbook"'
   $DOCKER_CMD 'ansible-playbook test.yml'
-  if [$? -ne 0]
-  then
-    $DOCKER_CMD 'echo "The tests failed."'
-    return 5
-  fi
+  $DOCKER_CMD 'if [$? -ne 0]; then echo "The tests failed."; return 5; fi'
 }
 
 # Execute Tests

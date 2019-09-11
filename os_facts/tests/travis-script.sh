@@ -50,11 +50,9 @@ run_tests() {
 set_result() {
   if [ $1 -eq 0 ]
   then
-    echo The tests passed.
-    return 0
+    echo 0
   else
-    echo The tests failed.
-    return 5
+    echo 5
   fi
 }
 
@@ -79,6 +77,7 @@ collect_results () {
 run_tests
 echo $PLAYRESULT
 UBUNTU=`set_result $PLAYRESULT`
+
 echo $UBUNTU
 # run_tests centos7
 # run_tests bullseye

@@ -4,7 +4,7 @@
     - name: "Create a sample file with no permissions"
       file:
         path: "{{ no_permissions_file }}"
-        mode: "000"
+        mode: "0000"
         state: "touch"
       notify: "cleanup"
       become: True

@@ -67,5 +67,6 @@ collect_results () {
 # DEBIAN=`run_tests bullseye`
 run_tests
 run_tests centos7
+run_tests bullseye
 # Return Test results to Travis
 # collect_results

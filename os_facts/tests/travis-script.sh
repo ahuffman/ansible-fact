@@ -7,7 +7,7 @@ run_tests () {
   ## Otherwise put the docker exec command in front of everything
   if [ ! -z "$1" ]
   then
-    DOCKER_CMD="docker exec -it $1 /bin/bash -c"
+    DOCKER_CMD="docker exec -it -u travis $1 /bin/bash -c"
     echo Container Information for $1:
   else
     DOCKER_CMD="/bin/bash -c"

@@ -1,9 +1,5 @@
 #! /bin/bash
-UBUNTU=""
-CENTOS7=""
-DEBIAN=""
-
-run_tests () {
+run_tests() {
   PLAYRESULT=1
   # Test run function
   # argument 1 is container name
@@ -47,10 +43,11 @@ run_tests () {
   $DOCKER_CMD 'echo Launching Test Playbook'
   $DOCKER_CMD 'cd /home/travis/build/ahuffman/ansible-fact/os_facts/tests/;pwd;echo;ansible-playbook test.yml -u travis;'
   PLAYRESULT=$?
+  echo $PLAYRESULT
 }
 
-set_result () {
-  if [ $PLAYRESULT -eq 0 ]
+set_result() {
+  if [ $1 -eq 0 ]
   then
     echo The tests passed.
     return 0
@@ -78,9 +75,10 @@ collect_results () {
 
 # Execute Tests
 ## Ubuntu VM
-
 run_tests
 echo $PLAYRESULT
+UBUNTU=`set_result $PLAYRESULT`
+echo $UBUNTU
 # run_tests centos7
 # run_tests bullseye
 # Return Test results to Travis

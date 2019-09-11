@@ -8,15 +8,15 @@ run_test () {
   if [$1 -n]
   then
     DOCKER_CMD="docker exec -it $1 /bin/bash -c"
-    echo "Container Information for $1:"
+    echo Container Information for $1:
   else
     DOCKER_CMD="/bin/bash -c"
-    echo "Virtual Machine Information for Ubuntu:"
+    echo Virtual Machine Information for Ubuntu:
   fi
   # Spit out our test platform info
   if [$1 -n]
   then
-    echo "$1 Container Configuration:"
+    echo $1 Container Configuration:
     docker inspect $1
     echo
   fi
@@ -24,12 +24,12 @@ run_test () {
   $DOCKER_CMD 'uname -a'
   $DOCKER_CMD 'echo'
   $DOCKER_CMD 'echo'
-  $DOCKER_CMD 'echo "Starting platform tests...'"
-  $DOCKER_CMD 'echo "Running on Ansible version:"'
+  $DOCKER_CMD 'echo Starting platform tests...'
+  $DOCKER_CMD 'echo Running on Ansible version:'
   $DOCKER_CMD 'ansible --version'
   $DOCKER_CMD 'echo "------------------------------------------"'
   $DOCKER_CMD 'echo'
-  $DOCKER_CMD 'echo "Ansible Configuration \(only changed\):"'
+  $DOCKER_CMD 'echo Ansible Configuration \(only changed\):'
   $DOCKER_CMD 'ansible-config dump --only-changed'
   $DOCKER_CMD 'echo "------------------------------------------"'
   $DOCKER_CMD 'echo'
@@ -42,7 +42,7 @@ run_test () {
   $DOCKER_CMD 'cd /home/travis/build/ahuffman/ansible-fact/os_facts/tests/'
   $DOCKER_CMD 'pwd'
   $DOCKER_CMD 'echo'
-  $DOCKER_CMD 'echo "Launching Test Playbook"'
+  $DOCKER_CMD 'echo Launching Test Playbook'
   $DOCKER_CMD 'ansible-playbook test.yml; PLAYRESULT=$?'
   $DOCKER_CMD 'if [ $PLAYRESULT -ne 0 ]; then echo The tests failed.; return 5; else echo The tests passed.; return 0; fi'
 }

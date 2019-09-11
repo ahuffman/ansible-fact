@@ -29,7 +29,7 @@ run_test () {
   $DOCKER_CMD 'ansible --version'
   $DOCKER_CMD 'echo "------------------------------------------"'
   $DOCKER_CMD 'echo'
-  $DOCKER_CMD 'echo "Ansible Configuration (only changed):"'
+  $DOCKER_CMD 'echo "Ansible Configuration \(only changed\):"'
   $DOCKER_CMD 'ansible-config dump --only-changed'
   $DOCKER_CMD 'echo "------------------------------------------"'
   $DOCKER_CMD 'echo'

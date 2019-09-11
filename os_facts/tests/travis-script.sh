@@ -64,22 +64,24 @@ collect_results () {
     echo Ubuntu Result: $UBUNTU
     echo CentOS7 Result: $CENTOS7
     echo Debian Result: $DEBIAN
-    return 5
+    exit 5
   else
     # very good, very very good
     echo All tests passed!
-    return 0
+    exit 0
   fi
 }
 
 # Execute Tests
 ## Ubuntu VM
 run_tests
-echo $PLAYRESULT
 UBUNTU=`set_result $PLAYRESULT`
+## CentOS7 Container
+run_tests centos7
+CENTOS7=`set_result $PLAYRESULT`
+## Debian Bullseye Container
+run_tests bullseye
+DEBIAN=`set_result $PLAYRESULT`
 
-echo $UBUNTU
-# run_tests centos7
-# run_tests bullseye
-# Return Test results to Travis
-# collect_results
+# Return Test results and exit to Travis
+collect_results

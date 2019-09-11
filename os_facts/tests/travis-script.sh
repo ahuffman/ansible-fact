@@ -41,7 +41,7 @@ run_tests () {
   $DOCKER_CMD 'echo'
   $DOCKER_CMD 'echo Launching Test Playbook'
   $DOCKER_CMD 'cd /home/travis/build/ahuffman/ansible-fact/os_facts/tests/;pwd;echo;ansible-playbook test.yml -u travis; PLAYRESULT=$?'
-  $DOCKER_CMD 'if [ $PLAYRESULT -ne 0 ]; then echo The tests failed.; return 5; else echo The tests passed.; return 0; fi'
+  $DOCKER_CMD 'if [ $PLAYRESULT -eq 0 ]; then echo The tests passed.; echo 0; else echo The tests failed.; echo 5; fi'
 }
 
 collect_results () {

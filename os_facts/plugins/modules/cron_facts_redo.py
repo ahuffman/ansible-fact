@@ -278,7 +278,7 @@ def main():
         # Output data
         cron_data = list()
         # Regex for parsing data
-        variable_re = re.compile(r'^([a-zA-Z0-9_-]*)[ \t]*=[ \t]*(.*)$')
+        variable_re = re.compile(r'^(?P<name>[a-zA-Z0-9_-]*)[ \t]*=[ \t]*(?P<value>.*)$')
         comment_re = re.compile(r'^#+')
         shebang_re = re.compile(r'^(#!){1}(.*)$')
         schedule_re = re.compile(r'^(?P<minute>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<hour>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<day_of_month>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<month>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<day_of_week>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<user>[A-Za-z0-9\-\_]*)[ \t]*(?P<command>.*)$')
@@ -319,8 +319,8 @@ def main():
 
                         # Capture script variables
                         if variable_re.search(line) and line != '' and line != None:
-                            variable['name'] = variable_re.search(line).group(1)
-                            variable['value'] = variable_re.search(line).group(2)
+                            variable['name'] = variable_re.search(line).group('name')
+                            variable['value'] = variable_re.search(line).group('value')
                             job['data']['variables'].append(variable)
 
                         # Capture script shell type

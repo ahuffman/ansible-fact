@@ -17,7 +17,7 @@ description:
     - "The module can display both parsed and raw cron configurations which is useful when some cron jobs are scripts and others are true schedules."
     - "The display of either raw configurations or parsed configurations can be limited via the module parameters."
 options:
-    output_raw_configs:
+    output_effective_configs:
         description:
             - Whether or not to output raw configuration lines (excluding comments) from the scanned cron files
         default: True
@@ -45,7 +45,7 @@ EXAMPLES = '''
 #     This is only useful if you have no scripting logic in the cron files (i.e. if's, do untils, etc.)
 - name: "Collect parsed cron data"
   scan_cron:
-    output_raw_configs: False
+    output_effective_configs: False
 '''
 
 RETURN = '''
@@ -288,7 +288,7 @@ def main():
             job = dict()
             job['path'] = cron
 
-            if params['output_raw_configs']:
+            if params['output_effective_configs']:
                 job['configuration'] = list()
 
             if params['output_parsed_configs']:
@@ -303,7 +303,7 @@ def main():
                 for l in config:
                     line = l.replace('\n', '').replace('\t', '    ')
                     # raw configuration output
-                    if params['output_raw_configs']:
+                    if params['output_effective_configs']:
                         # Not a comment line
                         if comment_re.search(line) is None and line != '' and line != None:
                             job['configuration'].append(line)

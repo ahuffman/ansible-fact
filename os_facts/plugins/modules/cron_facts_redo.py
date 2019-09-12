@@ -280,7 +280,7 @@ def main():
         # Regex for parsing data
         variable_re = re.compile(r'^(?P<name>[a-zA-Z0-9_-]*)[ \t]*=[ \t]*(?P<value>.*)$')
         comment_re = re.compile(r'^#+')
-        shebang_re = re.compile(r'^(#!){1}(.*)$')
+        shebang_re = re.compile(r'^(?P<shebang>#!){1}(?P<shell>.*)$')
         schedule_re = re.compile(r'^(?P<minute>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<hour>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<day_of_month>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<month>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<day_of_week>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<user>[A-Za-z0-9\-\_]*)[ \t]*(?P<command>.*)$')
 
         # work on each file that was found
@@ -325,7 +325,7 @@ def main():
 
                         # Capture script shell type
                         if shebang_re.search(line) and line != '' and line != None:
-                            job['data']['shell'] = shebang_re.search(line).group(2)
+                            job['data']['shell'] = shebang_re.search(line).group('shell')
 
                         # Capture cron schedules:
                         ##  don't try if a shell is set on the file, because it's a script at that point

@@ -11,7 +11,7 @@ class FactGatherer(AnsibleModule):
         self.fail_json("No default method was defined for this class")
 
     def __init__(self, argument_spec, **kwargs):
-        # If we have any global arguments, here is would we put them
+        # If we have any global arguments, here is where would we put them
         args = dict(
         )
         args.update(argument_spec)

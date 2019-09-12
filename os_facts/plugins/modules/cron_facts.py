@@ -9,7 +9,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: scan_cron
+module: cron_facts
 short_description: Collects cron job facts
 version_added: "2.8"
 description:
@@ -17,12 +17,12 @@ description:
     - "The module can display both parsed and effective cron configurations which is useful when some cron jobs are scripts and others are true schedules."
     - "The display of either effective configurations or parsed configurations can be limited via the module parameters."
 options:
-    strip_comments:
+    output_strip_comments:
         description:
             - Ignore comment lines from configuration
         default: False
         required: False
-    parse_configs:
+    output_parsed_configs:
         description:
             - Parse the configuration files
             - Get #! lines from scripts
@@ -31,7 +31,7 @@ options:
         required: False
     cron_files:
         description:
-            - A list of files to scan. If not set the scanner will search for standard files.
+            - A list of files to scan. If not set the module will search standard cron paths for files.
         default: []
         required: False
 author:
@@ -41,15 +41,15 @@ author:
 
 EXAMPLES = '''
 - name: "Collect all cron data"
-  scan_cron:
+  cron_facts:
 
 - name: "Strip comments and empty lines in configuration"
-  scan_cron:
-    strip_comments: False
+  cron_facts:
+    output_strip_comments: True
 
-- name: "Dont parse configuration"
-  scan_cron:
-    parse_configs: False
+- name: "Dont parse configuration, only show raw configurations"
+  cron_facts:
+    output_parsed_configs: False
 '''
 
 RETURN = '''
@@ -173,17 +173,7 @@ class CronGatherer(FactGatherer):
         # Regex for parsing data
         variable_re = re.compile(r'^([a-zA-Z0-9_-]*)[ \t]*=[ \t]*(.*)$')
         shebang_re = re.compile(r'^(#!){1}(.*)$')
-        #                            .--- minute (0 - 59)
-        #                            |                    .--- hour (0 - 23)
-        #                            |                    |                    .--- day of month (1 - 31)
-        #                            |                    |                    |                    .--- month (1 - 12) OR jan,feb,mar,apr ...
-        #                            |                    |                    |                    |                       .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
-        #                            |                    |                    |                    |                       |                       .---Optional user
-        #                            |                    |                    |                    |                       |                       |                   .command
         schedule_re = re.compile(r'^([0-9\*\-\,\/]+)[\s]+([0-9\*\-\,\/]+)[\s]+([0-9\*\-\,\/]+)[\s]+([0-9a-z\*\-\,\/]+)[\s]+([0-9a-z\*\-\,\/]+)[\s]+([a-z0-9\-\_]*)[\s]*(.*)$', re.IGNORECASE)
-        #                                .--- Yearly/monthly/weekly
-        #                                |                . Optional user
-        #                                |                |                      .command
         alt_schedule_re = re.compile(r'^(@[a-zA-Z]+)[\s]+([A-Za-z0-9\-\_]*)[\s]*(.*)$')
 
         # work on each file that was found
@@ -301,8 +291,8 @@ class CronGatherer(FactGatherer):
         super(CronGatherer, self).__init__(argument_spec=argument_spec, **kwargs)
         # Extract the module params into class variables
         self.cron_files = self.params.get('cron_files')
-        self.strip_comments = self.params.get('strip_comments')
-        self.parse_configs = self.params.get('parse_configs')
+        self.strip_comments = self.params.get('output_strip_comments')
+        self.parse_configs = self.params.get('output_parsed_configs')
         # Set additional class variables
 
 
@@ -311,8 +301,8 @@ def main():
     module = CronGatherer(
         dict(
             cron_files=dict(type='list', default=[], required=False),
-            strip_comments=dict(type='bool', default=False, required=False),
-            parse_configs=dict(type='bool', default=True, required=False),
+            output_strip_comments=dict(type='bool', default=False, required=False),
+            output_parsed_configs=dict(type='bool', default=True, required=False),
         ),
         supports_check_mode=True
     )

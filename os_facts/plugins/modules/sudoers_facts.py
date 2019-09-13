@@ -322,7 +322,7 @@ class SudoersGatherer(FactGatherer):
         defaults_re = re.compile(r'^(Defaults)+\s+(.*$)')
         cmnd_alias_re = re.compile(r'(?P<cmnd_alias>^Cmnd_Alias)+\s+(?P<alias_name>\S+)+\s*\={1}\s*(?P<commands>(\S+,{1}\s*)+\S+|\S+)\s*(?P<multi_line>\:)*(.*)*$')
         host_alias_re = re.compile(r'(^Host_Alias)+\s+(?P<alias_name>\S+)+\s*\={1}\s*(?P<hosts>(\S+,{1}\s*)+\S+|\S+)\s*(?P<multi_line>\:)*(.*)*$')
-        runas_alias_re = re.compile(r'(^Runas_Alias)+\s+(\S+)+\s*\={1}\s*((\S+,{1}\s*)+\S+|\S+)\s*(\:)*(.*)*$')
+        runas_alias_re = re.compile(r'(^Runas_Alias)+\s+(?P<alias_name>\S+)+\s*\={1}\s*(?P<users>(\S+,{1}\s*)+\S+|\S+)\s*(?P<multi_line>\:)*(.*)*$')
         user_alias_re = re.compile(r'(^User_Alias)+\s+(\S+)+\s*\={1}\s*((\S+,{1}\s*)+\S+|\S+)\s*(\:)*(.*)*$')
 
         # Defaults Parsing vars
@@ -426,24 +426,24 @@ class SudoersGatherer(FactGatherer):
 
                 # Parser for RunAs Alias
                 if runas_alias_re.search(line):
-                    if runas_alias_re.search(line).group(5) == ':':
+                    if runas_alias_re.search(line).group('multi_line') == ':':
                         # We have a multi line alias
                         runas_multi_line_aliases = line.split(':')
                         # Process each alias
-                        ra_multi_re = re.compile(r'(^Runas_Alias)*\s*(\S+)+\s*\={1}\s*((\S+,{1}\s*)+\S+|\S+).*$')
+                        ra_multi_re = re.compile(r'(^Runas_Alias)*\s*(?P<alias_name>\S+)+\s*\={1}\s*(?P<users>(\S+,{1}\s*)+\S+|\S+).*$')
                         for ra in user_multi_line_aliases:
                             ra_fields = ra_multi_re.search(ra)
-                            runas_name = ra_fields.group(2)
+                            runas_name = ra_fields.group('alias_name')
                             ra_users = list()
-                            ra_users_split = ra_fields.group(3).split(',')
+                            ra_users_split = ra_fields.group('users').split(',')
                             for user in ra_users_split:
                                 ra_users.append(user.lstrip())
                             runas_alias_formatted = {'name': runas_name, 'users': ra_users}
                             runas_aliases.append(runas_alias_formatted)
                     else:
-                        runas_name = runas_alias_re.search(line).group(2)
+                        runas_name = runas_alias_re.search(line).group('alias_name')
                         ra_users = list()
-                        for i in runas_alias_re.search(line).group(3).split(','):
+                        for i in runas_alias_re.search(line).group('users').split(','):
                             # Append a space free item to the list
                             ra_users.append(i.replace(' ', ''))
                         # Build command alias dict

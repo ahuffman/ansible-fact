@@ -160,7 +160,7 @@ class SudoersGatherer(FactGatherer):
     def get_user_specs(self, line, path):
         user_spec = dict()
         user_spec_re =  re.compile(r'(?P<users>^\S+,{1}\s*\S+|^\S+)\s*(?P<hosts>\S+,{1}\s*|\S+){1}\s*={1}\s*(\({1}(?P<operators>.*)\){1})*\s*(?P<selinux_1>ROLE\s*=\s*(?P<selinux_role1>\S+)|TYPE\s*=\s*(?P<selinux_type1>\S+))*\s*(?P<selinux_2>ROLE\s*=\s*(?P<selinux_role2>\S+)|TYPE\s*=\s*(?P<selinux_type2>\S+))*\s*(?P<solaris_1>PRIVS\s*=\s*(?P<solaris_privs1>\S+)|LIMITPRIVS\s*=\s*(?P<solaris_limitprivs1>\S+))*\s*(?P<solaris_2>PRIVS\s*=\s*(?P<solaris_privs2>\S+)|LIMITPRIVS\s*=\s*(?P<solaris_limitprivs2>\S+))*\s*(?P<tags>\S+:{1})*\s*(?P<commands>.*$)')
-        default_override_re = re.compile(r'(Defaults){1}([@:!>]){1}((\s*\S+,{1})+\s*\S+|\S+)\s*(.*$)')
+        default_override_re = re.compile(r'(Defaults){1}(?P<type>[@:!>]){1}(?P<hosts>(\s*\S+,{1})+\s*\S+|\S+)\s*(?P<defaults>.*$)')
         spec_fields = user_spec_re.search(line)
         if user_spec_re.search(line):
             user_spec['users'] = list()
@@ -266,36 +266,36 @@ class SudoersGatherer(FactGatherer):
             if default_override_re.search(line):
                 default_override = default_override_re.search(line)
                 # type
-                if default_override.group(2) == '@':
+                if default_override.group('type') == '@':
                     user_spec['type'] = 'host'
                     user_spec['hosts'] = list()
-                    hosts = default_override.group(3).split(',')
+                    hosts = default_override.group('hosts').split(',')
                     for host in hosts:
                         if host != '' and host != None:
                             user_spec['hosts'].append(host.lstrip())
-                elif default_override.group(2) == ':':
+                elif default_override.group('type') == ':':
                     user_spec['type'] = 'user'
                     user_spec['users'] = list()
-                    users = default_override.group(3).split(',')
+                    users = default_override.group('hosts').split(',')
                     for user in users:
                         if user != '' and user != None:
                             user_spec['users'].append(user.lstrip())
-                elif default_override.group(2) == '!':
+                elif default_override.group('type') == '!':
                     user_spec['type'] = 'command'
                     user_spec['commands'] = list()
-                    commands = default_override.group(3).split(',')
+                    commands = default_override.group('hosts').split(',')
                     for command in commands:
                         if command != '' and command != None:
                             user_spec['commands'].append(command.lstrip(optionals))
-                elif default_override.group(2) == '>':
+                elif default_override.group('type') == '>':
                     user_spec['type'] = 'runas'
                     user_spec['operators'] = list()
-                    operators = default_override.group(3).split(',')
+                    operators = default_override.group('hosts').split(',')
                     for op in operators:
                         if op != '' and op != None:
                             user_spec['operators'].append(op.lstrip())
                 user_spec['defaults'] = list()
-                defaults = default_override.group(5).split(',')
+                defaults = default_override.group('defaults').split(',')
                 for default in defaults:
                     if default != '' and default != None:
                         user_spec['defaults'].append(default.lstrip())

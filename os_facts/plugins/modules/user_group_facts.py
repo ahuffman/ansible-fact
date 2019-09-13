@@ -14,7 +14,7 @@ short_description: "Parses the local users and groups on a system"
 version_added: "2.7"
 author:
     - "Andrew J. Huffman (@ahuffman)"
-    - John Westcott IV (@john-westcott-iv)
+    - "John Westcott IV (@john-westcott-iv)"
 description:
     - "This module is designed to collect information from C(/etc/passwd), C(/etc/shadow), C(/etc/group), and C(/etc/gshadow) files and returns a set of Ansible facts based on the collected data."
     - "This module is compatible with Linux and Unix systems."

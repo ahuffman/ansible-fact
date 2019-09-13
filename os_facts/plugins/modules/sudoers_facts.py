@@ -131,17 +131,17 @@ class SudoersGatherer(FactGatherer):
         includes['include_directories'] = list()
 
         # Regex for "#includedir" and "#include" sudoers options
-        includedir_re = re.compile(r'(^#includedir)+\s+(.*$)')
-        include_re = re.compile(r'(^#include)+\s+(.*$)')
+        includedir_re = re.compile(r'(?P<includedir>^#includedir)+\s+(?P<path>.*$)')
+        include_re = re.compile(r'(?P<include>^#include)+\s+(?P<path>.*$)')
 
         for l in sudoers_file:
             line = l.replace('\n', '').replace('\t', '    ')
             # Search for '#includedir'
             if includedir_re.search(line):
-                include_dir = includedir_re.search(line).group(2)
+                include_dir = includedir_re.search(line).group('path')
             # Search for '#include'
             if include_re.search(line):
-                includes['include_files'].append(include_re.search(line).group(2))
+                includes['include_files'].append(include_re.search(line).group('path'))
 
         if include_dir:
             # build multi-file output

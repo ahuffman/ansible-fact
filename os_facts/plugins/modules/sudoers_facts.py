@@ -321,7 +321,7 @@ class SudoersGatherer(FactGatherer):
         include_re = re.compile(r'^#include')
         defaults_re = re.compile(r'^(Defaults)+\s+(.*$)')
         cmnd_alias_re = re.compile(r'(?P<cmnd_alias>^Cmnd_Alias)+\s+(?P<alias_name>\S+)+\s*\={1}\s*(?P<commands>(\S+,{1}\s*)+\S+|\S+)\s*(?P<multi_line>\:)*(.*)*$')
-        host_alias_re = re.compile(r'(^Host_Alias)+\s+(\S+)+\s*\={1}\s*((\S+,{1}\s*)+\S+|\S+)\s*(\:)*(.*)*$')
+        host_alias_re = re.compile(r'(^Host_Alias)+\s+(?P<alias_name>\S+)+\s*\={1}\s*(?P<hosts>(\S+,{1}\s*)+\S+|\S+)\s*(?P<multi_line>\:)*(.*)*$')
         runas_alias_re = re.compile(r'(^Runas_Alias)+\s+(\S+)+\s*\={1}\s*((\S+,{1}\s*)+\S+|\S+)\s*(\:)*(.*)*$')
         user_alias_re = re.compile(r'(^User_Alias)+\s+(\S+)+\s*\={1}\s*((\S+,{1}\s*)+\S+|\S+)\s*(\:)*(.*)*$')
 
@@ -389,9 +389,9 @@ class SudoersGatherer(FactGatherer):
                             cmnd_alias_formatted = {'name': cmnds_name, 'commands': ca_cmnds}
                             command_aliases.append(cmnd_alias_formatted)
                     else:
-                        command_name = cmnd_alias_re.search(line).group(2)
+                        command_name = cmnd_alias_re.search(line).group('alias_name')
                         commands = list()
-                        for i in cmnd_alias_re.search(line).group(3).split(','):
+                        for i in cmnd_alias_re.search(line).group('commands').split(','):
                             # Append a space free item to the list
                             commands.append(i.replace(' ', ''))
                         # Build command alias dict
@@ -400,24 +400,24 @@ class SudoersGatherer(FactGatherer):
 
                 # Parser for Host Alias
                 if host_alias_re.search(line):
-                    if host_alias_re.search(line).group(5) == ':':
+                    if host_alias_re.search(line).group('multi_line') == ':':
                         # We have a multi line alias
                         host_multi_line_aliases = line.split(':')
                         # Process each alias
-                        ha_multi_re = re.compile(r'(^Host_Alias)*\s*(\S+)+\s*\={1}\s*((\S+,{1}\s*)+\S+|\S+).*$')
+                        ha_multi_re = re.compile(r'(^Host_Alias)*\s*(?P<alias_name>\S+)+\s*\={1}\s*(?P<hosts>(\S+,{1}\s*)+\S+|\S+).*$')
                         for ha in host_multi_line_aliases:
                             ha_fields = ha_multi_re.search(ha)
-                            hosts_name = ha_fields.group(2)
+                            hosts_name = ha_fields.group('alias_name')
                             ha_hosts = list()
-                            ha_hosts_split = ha_fields.group(3).split(',')
+                            ha_hosts_split = ha_fields.group('hosts').split(',')
                             for host in ha_hosts_split:
                                 ha_hosts.append(host.lstrip())
                             host_alias_formatted = {'name': hosts_name, 'hosts': ha_hosts}
                             host_aliases.append(host_alias_formatted)
                     else:
-                        host_name = host_alias_re.search(line).group(2)
+                        host_name = host_alias_re.search(line).group('alias_name')
                         hosts = list()
-                        for i in host_alias_re.search(line).group(3).split(','):
+                        for i in host_alias_re.search(line).group('hosts').split(','):
                             # Append a space free item to the list
                             hosts.append(i.replace(' ', ''))
                         # Build command alias dict

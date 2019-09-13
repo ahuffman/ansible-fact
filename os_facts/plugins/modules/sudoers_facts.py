@@ -320,7 +320,7 @@ class SudoersGatherer(FactGatherer):
         comment_re = re.compile(r'^#+')
         include_re = re.compile(r'^#include')
         defaults_re = re.compile(r'^(Defaults)+\s+(.*$)')
-        cmnd_alias_re = re.compile(r'(^Cmnd_Alias)+\s+(\S+)+\s*\={1}\s*((\S+,{1}\s*)+\S+|\S+)\s*(\:)*(.*)*$')
+        cmnd_alias_re = re.compile(r'(?P<cmnd_alias>^Cmnd_Alias)+\s+(?P<alias_name>\S+)+\s*\={1}\s*(?P<commands>(\S+,{1}\s*)+\S+|\S+)\s*(?P<multi_line>\:)*(.*)*$')
         host_alias_re = re.compile(r'(^Host_Alias)+\s+(\S+)+\s*\={1}\s*((\S+,{1}\s*)+\S+|\S+)\s*(\:)*(.*)*$')
         runas_alias_re = re.compile(r'(^Runas_Alias)+\s+(\S+)+\s*\={1}\s*((\S+,{1}\s*)+\S+|\S+)\s*(\:)*(.*)*$')
         user_alias_re = re.compile(r'(^User_Alias)+\s+(\S+)+\s*\={1}\s*((\S+,{1}\s*)+\S+|\S+)\s*(\:)*(.*)*$')
@@ -374,16 +374,16 @@ class SudoersGatherer(FactGatherer):
                 # Aliases:
                 # Parser for Command Alias
                 if cmnd_alias_re.search(line):
-                    if cmnd_alias_re.search(line).group(5) == ':':
+                    if cmnd_alias_re.search(line).group('multi_line') == ':':
                         # We have a multi line alias
                         cmnd_multi_line_aliases = line.split(':')
                         # Process each alias
-                        ca_multi_re = re.compile(r'(^Cmnd_Alias)*\s*(\S+)+\s*\={1}\s*((\S+,{1}\s*)+\S+|\S+).*$')
+                        ca_multi_re = re.compile(r'(^Cmnd_Alias)*\s*(?P<alias_name>\S+)+\s*\={1}\s*(?P<commands>(\S+,{1}\s*)+\S+|\S+).*$')
                         for ca in cmnd_multi_line_aliases:
                             ca_fields = ca_multi_re.search(ca)
-                            cmnds_name = ca_fields.group(2)
+                            cmnds_name = ca_fields.group('alias_name')
                             ca_cmnds = list()
-                            ca_cmnds_split = ca_fields.group(3).split(',')
+                            ca_cmnds_split = ca_fields.group('commands').split(',')
                             for cmnd in ca_cmnds_split:
                                 ca_cmnds.append(cmnd.lstrip())
                             cmnd_alias_formatted = {'name': cmnds_name, 'commands': ca_cmnds}

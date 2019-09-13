@@ -239,10 +239,26 @@ class UserGroupGatherer(FactGatherer):
 def main():
     module = UserGroupGatherer(
         dict(
-            passwd_path=dict(type='str', required=False, default='/etc/passwd'),
-            shadow_path=dict(type='str', required=False, default='/etc/shadow'),
-            group_path=dict(type='str', required=False, default='/etc/group'),
-            gshadow_path=dict(type='str', required=False, default='/etc/gshadow')
+            passwd_path=dict(
+                type='str',
+                required=False,
+                default='/etc/passwd'
+            ),
+            shadow_path=dict(
+                type='str',
+                required=False,
+                default='/etc/shadow'
+            ),
+            group_path=dict(
+                type='str',
+                required=False,
+                default='/etc/group'
+            ),
+            gshadow_path=dict(
+                type='str',
+                required=False,
+                default='/etc/gshadow'
+            )
         ),
         supports_check_mode=True
     )

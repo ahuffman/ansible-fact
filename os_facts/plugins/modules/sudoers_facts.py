@@ -159,7 +159,7 @@ class SudoersGatherer(FactGatherer):
 
     def get_user_specs(self, line, path):
         user_spec = dict()
-        user_spec_re =  re.compile(r'(^\S+,{1}\s*\S+|^\S+)\s*(\S+,{1}\s*|\S+){1}\s*={1}\s*(\({1}(.*)\){1})*\s*(ROLE\s*=\s*(\S+)|TYPE\s*=\s*(\S+))*\s*(ROLE\s*=\s*(\S+)|TYPE\s*=\s*(\S+))*\s*(PRIVS\s*=\s*(\S+)|LIMITPRIVS\s*=\s*(\S+))*\s*(PRIVS\s*=\s*(\S+)|LIMITPRIVS\s*=\s*(\S+))*\s*(\S+:{1})*\s*(.*$)')
+        user_spec_re =  re.compile(r'(?P<users>^\S+,{1}\s*\S+|^\S+)\s*(?P<hosts>\S+,{1}\s*|\S+){1}\s*={1}\s*(\({1}(?P<operators>.*)\){1})*\s*(?P<selinux_1>ROLE\s*=\s*(?P<selinux_role1>\S+)|TYPE\s*=\s*(?P<selinux_type1>\S+))*\s*(?P<selinux_2>ROLE\s*=\s*(?P<selinux_role2>\S+)|TYPE\s*=\s*(?P<selinux_type2>\S+))*\s*(?P<solaris_1>PRIVS\s*=\s*(?P<solaris_privs1>\S+)|LIMITPRIVS\s*=\s*(?P<solaris_limitprivs1>\S+))*\s*(?P<solaris_2>PRIVS\s*=\s*(?P<solaris_privs2>\S+)|LIMITPRIVS\s*=\s*(?P<solaris_limitprivs2>\S+))*\s*(?P<tags>\S+:{1})*\s*(?P<commands>.*$)')
         default_override_re = re.compile(r'(Defaults){1}([@:!>]){1}((\s*\S+,{1})+\s*\S+|\S+)\s*(.*$)')
         spec_fields = user_spec_re.search(line)
         if user_spec_re.search(line):
@@ -173,73 +173,73 @@ class SudoersGatherer(FactGatherer):
             user_spec['tags'] = list()
             user_spec['commands'] = list()
             # users
-            users = spec_fields.group(1).split(',')
+            users = spec_fields.group('users').split(',')
             for user in users:
                 if user != '' and user != None:
                     user_spec['users'].append(user.lstrip())
             # hosts
-            hosts = spec_fields.group(2).split(',')
+            hosts = spec_fields.group('hosts').split(',')
             for host in hosts:
                 if host != '' and host != None:
                     user_spec['hosts'].append(host.lstrip())
             # operators - optional
-            if spec_fields.group(4):
-                operators = spec_fields.group(4).split(',')
+            if spec_fields.group('operators'):
+                operators = spec_fields.group('operators').split(',')
                 for op in operators:
                     if op != '' and op != None:
                         user_spec['operators'].append(op.lstrip())
             # SELinux - optional
-            if spec_fields.group(5) or spec_fields.group(8):
+            if spec_fields.group('selinux_1') or spec_fields.group('selinux_2'):
               ## TYPE
-                type_re = re.compile(r'(^TYPE){1}\s*={1}\s*')
-                if spec_fields.group(5):
-                    if type_re.search(spec_fields.group(5)):
-                        if type_re.search(spec_fields.group(5)).group(1) == 'TYPE':
-                            user_spec['selinux_type'] = spec_fields.group(7)
-                if spec_fields.group(8):
-                    if type_re.search(spec_fields.group(8)):
-                        if type_re.search(spec_fields.group(8)).group(1) == 'TYPE':
-                            user_spec['selinux_type'] = spec_fields.group(10)
+                type_re = re.compile(r'?P<type>(^TYPE){1}\s*={1}\s*')
+                if spec_fields.group('selinux_1'):
+                    if type_re.search(spec_fields.group('selinux_1')):
+                        if type_re.search(spec_fields.group('selinux_1')).group('type') == 'TYPE':
+                            user_spec['selinux_type'] = spec_fields.group('selinux_type1')
+                if spec_fields.group('selinux_2'):
+                    if type_re.search(spec_fields.group('selinux_2')):
+                        if type_re.search(spec_fields.group('selinux_2')).group('type') == 'TYPE':
+                            user_spec['selinux_type'] = spec_fields.group('selinux_type2')
               ## ROLE
-                role_re = re.compile(r'(^ROLE){1}\s*={1}\s*')
-                if spec_fields.group(5):
-                    if role_re.search(spec_fields.group(5)):
-                        if role_re.search(spec_fields.group(5)).group(1) == 'ROLE':
-                            user_spec['selinux_role'] = spec_fields.group(6)
-                if spec_fields.group(8):
-                    if role_re.search(spec_fields.group(8)):
-                        if role_re.search(spec_fields.group(8)).group(1) == 'ROLE':
-                            user_spec['selinux_role'] = spec_fields.group(9)
+                role_re = re.compile(r'(?P<role>^ROLE){1}\s*={1}\s*')
+                if spec_fields.group('selinux_1'):
+                    if role_re.search(spec_fields.group('selinux_1')):
+                        if role_re.search(spec_fields.group('selinux_1')).group('role') == 'ROLE':
+                            user_spec['selinux_role'] = spec_fields.group('selinux_role1')
+                if spec_fields.group('selinux_2'):
+                    if role_re.search(spec_fields.group('selinux_2')):
+                        if role_re.search(spec_fields.group('selinux_2')).group('role') == 'ROLE':
+                            user_spec['selinux_role'] = spec_fields.group('selinux_role2')
             # Solaris - optional
-            if spec_fields.group(11) or spec_fields.group(14):
+            if spec_fields.group('solaris_1') or spec_fields.group('solaris_2'):
               ## PRIVS
-                privs_re = re.compile(r'(^PRIVS){1}\s*={1}\s*')
-                if spec_fields.group(11):
-                    if privs_re.search(spec_fields.group(11)):
-                        if privs_re.search(spec_fields.group(11)).group(1) == 'PRIVS':
-                            user_spec['solaris_privs'] = spec_fields.group(12)
-                if spec_fields.group(14):
-                    if privs_re.search(spec_fields.group(14)):
-                        if privs_re.search(spec_fields.group(14)).group(1) == 'PRIVS':
-                            user_spec['solaris_privs'] = spec_fields.group(17)
+                privs_re = re.compile(r'(?P<privs>^PRIVS){1}\s*={1}\s*')
+                if spec_fields.group('solaris_1'):
+                    if privs_re.search(spec_fields.group('solaris_1')):
+                        if privs_re.search(spec_fields.group('solaris_1')).group('privs') == 'PRIVS':
+                            user_spec['solaris_privs'] = spec_fields.group('solaris_privs1')
+                if spec_fields.group('solaris_2'):
+                    if privs_re.search(spec_fields.group('solaris_2')):
+                        if privs_re.search(spec_fields.group('solaris_2')).group('privs') == 'PRIVS':
+                            user_spec['solaris_privs'] = spec_fields.group('solaris_privs2')
               ## LIMITPRIVS
-                limitprivs_re = re.compile(r'(^LIMITPRIVS){1}\s*={1}\s*')
-                if spec_fields.group(11):
-                    if limitprivs_re.search(spec_fields.group(11)):
-                        if limitprivs_re.search(spec_fields.group(11)).group(1) == 'LIMITPRIVS':
-                            user_spec['solaris_limitprivs'] = spec_fields.group(13)
-                if spec_fields.group(14):
-                    if limitprivs_re.search(spec_fields.group(14)):
-                        if limitprivs_re.search(spec_fields.group(14)).group(1) == 'LIMITPRIVS':
-                            user_spec['solaris_limitprivs'] = spec_fields.group(16)
+                limitprivs_re = re.compile(r'(?P<limitprivs>^LIMITPRIVS){1}\s*={1}\s*')
+                if spec_fields.group('solaris_1'):
+                    if limitprivs_re.search(spec_fields.group('solaris_1')):
+                        if limitprivs_re.search(spec_fields.group('solaris_1')).group('limitprivs') == 'LIMITPRIVS':
+                            user_spec['solaris_limitprivs'] = spec_fields.group('solaris_limitprivs1')
+                if spec_fields.group('solaris_2'):
+                    if limitprivs_re.search(spec_fields.group('solaris_2')):
+                        if limitprivs_re.search(spec_fields.group('solaris_2')).group('limitprivs') == 'LIMITPRIVS':
+                            user_spec['solaris_limitprivs'] = spec_fields.group('solaris_limitprivs2')
             # tags - optional
-            if spec_fields.group(17):
-                tags = spec_fields.group(17).split(':')
+            if spec_fields.group('tags'):
+                tags = spec_fields.group('tags').split(':')
                 for tag in tags:
                     if tag != '' and tag != None:
                         user_spec['tags'].append(tag)
             # commands
-            commands = spec_fields.group(18).split(',')
+            commands = spec_fields.group('commands').split(',')
             for command in commands:
                 if command != '' and command != None:
                     user_spec['commands'].append(command.lstrip())

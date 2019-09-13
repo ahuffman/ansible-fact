@@ -319,7 +319,7 @@ class SudoersGatherer(FactGatherer):
         # Regex for Parsers
         comment_re = re.compile(r'^#+')
         include_re = re.compile(r'^#include')
-        defaults_re = re.compile(r'^(Defaults)+\s+(.*$)')
+        defaults_re = re.compile(r'^(Defaults)+\s+(?P<defaults>.*$)')
         cmnd_alias_re = re.compile(r'(?P<cmnd_alias>^Cmnd_Alias)+\s+(?P<alias_name>\S+)+\s*\={1}\s*(?P<commands>(\S+,{1}\s*)+\S+|\S+)\s*(?P<multi_line>\:)*(.*)*$')
         host_alias_re = re.compile(r'(^Host_Alias)+\s+(?P<alias_name>\S+)+\s*\={1}\s*(?P<hosts>(\S+,{1}\s*)+\S+|\S+)\s*(?P<multi_line>\:)*(.*)*$')
         runas_alias_re = re.compile(r'(^Runas_Alias)+\s+(?P<alias_name>\S+)+\s*\={1}\s*(?P<users>(\S+,{1}\s*)+\S+|\S+)\s*(?P<multi_line>\:)*(.*)*$')
@@ -355,18 +355,18 @@ class SudoersGatherer(FactGatherer):
             if self.output_parsed_configs:
                 # Parser for defaults
                 if defaults_re.search(line):
-                    defaults_config_line = defaults_re.search(line).group(2)
-                    defaults_env_keep_re = re.compile(r'^(env_keep)+((\s\=)|(\s\+\=))+(\s)+(.*$)')
-                    defaults_sec_path_re = re.compile(r'^(secure_path)+(\s)+(\=)+(\s)+(.*$)')
+                    defaults_config_line = defaults_re.search(line).group('defaults')
+                    defaults_env_keep_re = re.compile(r'^(env_keep)+((\s\=)|(\s\+\=))+(\s)+(?P<env_keep_opts>.*$)')
+                    defaults_sec_path_re = re.compile(r'^(secure_path)+(\s)+(\=)+(\s)+(?P<paths>.*$)')
                     # Break up multi-line defaults config lines into single config options
                     if defaults_env_keep_re.search(defaults_config_line):
-                        defaults_multi = defaults_env_keep_re.search(defaults_config_line).group(6).split()
+                        defaults_multi = defaults_env_keep_re.search(defaults_config_line).group('env_keep_opts').split()
                         # env_keep default options
                         for i in defaults_multi:
                             env_keep_opts.append(i.replace('"', ''))
                     # build secure path dict and append to defaults list
                     elif defaults_sec_path_re.search(defaults_config_line):
-                        secure_paths = defaults_sec_path_re.search(defaults_config_line).group(5).split(':')
+                        secure_paths = defaults_sec_path_re.search(defaults_config_line).group('paths').split(':')
                         config_defaults.append({'secure_path': secure_paths})
                     # single defaults option case
                     else:

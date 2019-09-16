@@ -28,7 +28,8 @@ options:
         default: True
         required: False
 author:
-    - Andrew J. Huffman (@ahuffman)
+    - "Andrew J. Huffman (@ahuffman)"
+    - "John Westcott IV (@john-westcott-iv)"
 '''
 
 EXAMPLES = '''
@@ -177,9 +178,12 @@ cron:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-import os
-from os.path import isfile, isdir, join
 import re
+import stat
+from pwd import getpwuid
+from grp import getgrgid
+from os.path import isfile, isdir, join
+from os import stat, listdir
 
 def main():
     module_args = dict(
@@ -222,33 +226,61 @@ def main():
 
     params = module.params
 
-    def get_cron_allow():
-        allow = dict()
-        allow['path'] = '/etc/cron.allow'
-        allow['users'] = list()
+    def get_perms(filename):
+        file_perms = dict()
         try:
-            cron_allow = open('/etc/cron.allow', 'r')
-            for line in cron_allow:
-                user = line.replace('\n', '')
-                allow['users'].append(user)
-            cron_allow.close()
+            file_stats = stat(filename)
+            try:
+                file_perms['owner'] = getpwuid(file_stats.st_uid).pw_name
+            except KeyError as e:
+                file_perms['owner'] = file_stats.st_uid
+            try:
+                file_perms['group'] = getgrgid(file_stats.st_gid).gr_name
+            except KeyError as e:
+                file_perms['group'] = file_stats.st_gid
+            try:
+                file_perms['mode'] = oct(file_stats.st_mode)[-4:]
+            except:
+                file_perms['mode'] = ''
         except:
+            # add a message we couldn't read the file later
+            file_perms['owner'] = None
+            file_perms['group'] = None
+            file_perms['mode'] = None
             pass
-        return allow
+        return file_perms
 
-    def get_cron_deny():
-        deny = dict()
-        deny['path'] = '/etc/cron.deny'
-        deny['users'] = list()
+    def get_cron_allow_deny(allow_or_deny, filename = None):
+        result = dict()
+        if filename == None or filename == '':
+            path = "/etc/cron.{}".format(allow_or_deny)
+        else:
+            # to handle passing allow/deny files with module param list
+            path = filename
+
         try:
-            cron_deny = open('/etc/cron.deny', 'r')
-            for line in cron_deny:
+            # grab file permissions
+            perms = get_perms(path)
+            result['users'] = list()
+            result['owner'] = perms['owner']
+            result['group'] = perms['group']
+            result['mode'] = perms['mode']
+            file = open(path, 'rt')
+            for line in file:
                 user = line.replace('\n', '')
-                deny['users'].append(user)
-            cron_deny.close()
+                result['users'].append(user)
+            file.close()
+            result['owner'] = perms['owner']
+            result['group'] = perms['group']
+            result['mode'] = perms['mode']
+            result['path'] = path
         except:
+            result = dict(
+                path = path,
+                info = "File does not exist"
+            )
             pass
-        return deny
+        return result
 
     def get_cron_files():
         # standard cron locations for cron file discovery
@@ -267,9 +299,9 @@ def main():
         # Look for files in cron directories and append to cron_paths
         for dir in cron_dirs:
             try:
-                cron_paths += [join(dir, filename) for filename in os.listdir(dir) if isfile(join(dir, filename))]
+                cron_paths += [join(dir, filename) for filename in listdir(dir) if isfile(join(dir, filename))]
                 # keep digging
-                cron_dirs += [join(dir, filename) for filename in os.listdir(dir) if isdir(join(dir, filename))]
+                cron_dirs += [join(dir, filename) for filename in listdir(dir) if isdir(join(dir, filename))]
             except:
                 pass
         return cron_paths
@@ -362,10 +394,13 @@ def main():
         return cron_data
 
     # Do work
-    cron_allow = get_cron_allow()
-    cron_deny = get_cron_deny()
     cron_paths = get_cron_files()
     cron_data = get_cron_data(cron_paths)
+    cron_allow = get_cron_allow_deny('allow')
+    cron_deny = get_cron_allow_deny('deny')
+    # After main work
+    ## Make sure our allow/deny files get added to scanned paths list
+
 
     # Build output
     cron = dict()

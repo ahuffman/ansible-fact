@@ -277,11 +277,17 @@ def main():
     def get_cron_data(cron_paths):
         # Output data
         cron_data = list()
-        # Regex for parsing data
+        # Regexes for parsing data
+        ## for capturing key/value pairs in schedules
         variable_re = re.compile(r'^(?P<name>[a-zA-Z0-9_-]*)[ \t]*=[ \t]*(?P<value>.*)$')
+        ## for capturing/filtering comment lines
         comment_re = re.compile(r'^#+')
+        ## for capturing script shell line
         shebang_re = re.compile(r'^(?P<shebang>#!){1}(?P<shell>.*)$')
+        ## normal cron schedules
         schedule_re = re.compile(r'^(?P<minute>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<hour>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<day_of_month>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<month>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<day_of_week>[0-9a-zA-Z\*\-\,\/]+)[ \t]+(?P<user>[A-Za-z0-9\-\_]*)[ \t]*(?P<command>.*)$')
+        ## timeframe style schedule
+        timeframe_schedule_re = re.compile(r'^@(?P<timeframe>[a-zA-Z]+)[\s\t]+(?P<command>[A-Za-z0-9\-\_]*)[\s\t]*(?P<comments>.*)$')
 
         # work on each file that was found
         for cron in cron_paths:
@@ -340,6 +346,12 @@ def main():
                                 sched['user'] = schedule_re.search(line).group('user')
                             sched['command'] = schedule_re.search(line).group('command')
                             job['data']['schedules'].append(sched)
+                        # if not normal schedule, not an empty line and not a cron script file
+                        elif timeframe_schedule_re.search(line) != None and line != '' and line != None and job['data']['shell'] == '':
+                            sched['timeframe'] = timeframe_schedule_re.group('timeframe')
+                            sched['command'] = timeframe_schedule_re.group('command')
+                            job['data']['schedules'].append(sched)
+
                 config.close()
 
             except:

@@ -12,7 +12,7 @@ class FactGatherer(AnsibleModule):
     ####### End Of Helper Methods ########
 
     def doDefault(self):
-        self.fail_json("No default method was defined for this class")
+        self.fail_json(msg="No default method was defined for this class")
 
     def __init__(self, argument_spec, **kwargs):
         # If we have any global arguments, here is where would we put them

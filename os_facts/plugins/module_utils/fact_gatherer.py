@@ -27,8 +27,8 @@ class FactGatherer(AnsibleModule):
         os_facts = distro_facts.collect(self)
         os_family = os_facts['os_family']
         distro = os_facts['distribution']
-        distribution_release = os_facts['distribution_release']
-        distribution_major_version = os_facts['distribution_major_version']
+        distribution_release = os_facts['distribution_release'].replace('.', '_')
+        distribution_major_version = os_facts['distribution_major_version'].replace('.', '_')
 
         prescidence = [
             "{}{}{}".format(os_family,distro,distribution_release),

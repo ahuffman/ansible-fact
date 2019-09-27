@@ -92,27 +92,27 @@ class NetstatGatherer(FactGatherer):
         if not self.parse_configs:
             self.exit_json(**{'lsof_stdout_lines': stdout.split('\n')})
 
-        re_listen_ports = re.compile(r'^(?P<cmd>[^\s]+)\s+(?P<pid>[0-9]+)\s+(?P<user>[^\s]+)\s+(?P<fd>\d+[^\s]+)\s+(?P<type>[^\s]+)\s+(?P<dev>[^\s]+)\s+(?P<size>[^\s]+)\s+(?P<node>[^\s]+)\s+(?P<address>[^:]+):(?P<port>[^\s]+)( \((?P<state>[^\(]+)\)){0,1}$')
+        re_listen_ports = re.compile(r'^(?P<name>[^\s]+)\s+(?P<pid>[0-9]+)\s+(?P<user>[^\s]+)\s+(?P<fd>\d+[^\s]+)\s+(?P<type>[^\s]+)\s+(?P<dev>[^\s]+)\s+(?P<size>[^\s]+)\s+(?P<protocol>[^\s]+)\s+(?P<address>[^:]+):(?P<port>[^\s]+)( \((?P<state>[^\(]+)\)){0,1}$')
 
         listen_ports = []
         for line in stdout.split('\n'):
             line_match = re_listen_ports.search(line)
             if line_match != None:
                 port = {
-                    'cmd': line_match.group('cmd'),
+                    'name': line_match.group('name'),
                     'pid': line_match.group('pid'),
                     'user': line_match.group('user'),
                     'fd': line_match.group('fd'),
                     'type': line_match.group('type'),
                     'dev': line_match.group('dev'),
                     'size': line_match.group('size'),
-                    'node': line_match.group('node'),
+                    'protocol': line_match.group('protocol'),
                     'address': line_match.group('address'),
                     'port': line_match.group('port'),
                     'state': line_match.group('state'),
                 }
     
-                if port['node'] == 'UDP' or (port['node'] == 'TCP' and port['state'] == 'LISTEN'):
+                if port['protocol'] == 'UDP' or (port['protocol'] == 'TCP' and port['state'] == 'LISTEN'):
                     if port['address'] == '*':
                         port['address'] = '0.0.0.0'
                     listen_ports.append(port)

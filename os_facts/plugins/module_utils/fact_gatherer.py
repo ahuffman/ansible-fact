@@ -4,8 +4,12 @@ from ansible.module_utils.facts.system import distribution
 import re
 
 class FactGatherer(AnsibleModule):
+    ####### Helper Methods ########
+
     def remove_comment(self, line, comment_characters):
         return re.sub('[{}].*'.format(comment_characters), '', line)
+
+    ####### End Of Helper Methods ########
 
     def doDefault(self):
         self.fail_json("No default method was defined for this class")

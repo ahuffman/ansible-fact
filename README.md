@@ -7,6 +7,9 @@
 |os_facts| Ansible Galaxy collection of Operating System fact collectors|[os_facts/docs/README.md](os_facts/docs/README.md)|
 |application_facts| Ansible Galaxy collection of Application specific fact collectors | [application_facts/docs/README.md](application_facts/docs/README.md)|
 
+## Contributing
+For contributing please see [CONTRIBUTING.md](./CONTRIBUTING.md)
+
 ## Automated Testing
 Testing is automated by using Travis-CI.  
 All tests are contained in each collection's `tests` directory.  

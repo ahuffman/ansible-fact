@@ -79,10 +79,10 @@ class NetstatGatherer(FactGatherer):
 #        self.exit_json(**{ 'ansible_facts': {'cron': cron } })
 
 
-    def doAIX(self):
+    def runAndParseLSOF(self, lsof_args):
         command = self.findCommand('lsof')
         try:
-            rc, stdout, stderr = self.run_command([command, '+c0 -i 2'])
+            rc, stdout, stderr = self.run_command([command, lsof_args])
         except Exception as e:
             self.fail_json(msg="Failed to run {}: {}".format(command, e))
 
@@ -92,7 +92,7 @@ class NetstatGatherer(FactGatherer):
         if not self.parse_configs:
             self.exit_json(**{'lsof_stdout_lines': stdout.split('\n')})
 
-        re_listen_ports = re.compile(r'^(?P<cmd>[^\s]+)\s+(?P<pid>[0-9]+)\s+(?P<user>[^\s]+)\s+(?P<fd>\d+[^\s]+)\s+(?P<type>[^\s]+)\s+(?P<dev>[^\s]+)\s+(?P<size>[^\s]+)\s+(?P<node>[^\s]+)\s+(?P<name>[^\s]+)( \((?P<state>[^\(]+)\)){0,1}$')
+        re_listen_ports = re.compile(r'^(?P<cmd>[^\s]+)\s+(?P<pid>[0-9]+)\s+(?P<user>[^\s]+)\s+(?P<fd>\d+[^\s]+)\s+(?P<type>[^\s]+)\s+(?P<dev>[^\s]+)\s+(?P<size>[^\s]+)\s+(?P<node>[^\s]+)\s+(?P<address>[^:]+):(?P<port>[^\s]+)( \((?P<state>[^\(]+)\)){0,1}$')
 
         listen_ports = []
         for line in stdout.split('\n'):
@@ -107,14 +107,23 @@ class NetstatGatherer(FactGatherer):
                     'dev': line_match.group('dev'),
                     'size': line_match.group('size'),
                     'node': line_match.group('node'),
-                    'name': line_match.group('name'),
+                    'address': line_match.group('address'),
+                    'port': line_match.group('port'),
                     'state': line_match.group('state'),
                 }
     
                 if port['node'] == 'UDP' or (port['node'] == 'TCP' and port['state'] == 'LISTEN'):
+                    if port['address'] == '*':
+                        port['address'] = '0.0.0.0'
                     listen_ports.append(port)
 
         self.exit_json(**{ 'ansible_facts': {'listening_ports': listen_ports} })
+
+    def doDarwin(self):
+        self.runAndParseLSOF('+c0 -n -P -i')
+
+    def doAIX(self):
+        self.runAndParseLSOF('+c0 -i 2 -n -P')
 
     #def doDarwin(self):
     #    command = self.findCommand('lsof')

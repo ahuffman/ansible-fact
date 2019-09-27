@@ -9,6 +9,12 @@ class FactGatherer(AnsibleModule):
     def remove_comment(self, line, comment_characters):
         return re.sub('[{}].*'.format(comment_characters), '', line)
 
+    def findCommand(self, command):
+        try:
+            return self.get_bin_path(command, True)
+        except Exception as e:
+            self.fail_json(msg="Unable to find {} command: {}".format(command, e))
+
     ####### End Of Helper Methods ########
 
     def doDefault(self):

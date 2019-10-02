@@ -27,10 +27,10 @@ author:
 
 EXAMPLES = '''
 - name: "Collect all netstat data"
-  netstat_facts:
+  listen_ports_facts:
 
 - name: "Dont parse output, only show raw data"
-  netstat_facts:
+  listen_ports_facts:
     output_parsed_configs: False
 '''
 
@@ -111,7 +111,7 @@ class NetstatGatherer(FactGatherer):
                     'port': line_match.group('port'),
                     'state': line_match.group('state'),
                 }
-    
+
                 if port['protocol'] == 'UDP' or (port['protocol'] == 'TCP' and port['state'] == 'LISTEN'):
                     if port['address'] == '*':
                         port['address'] = '0.0.0.0'

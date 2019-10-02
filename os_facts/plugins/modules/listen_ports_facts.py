@@ -35,32 +35,7 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-all_scanned_files:
-  - configuration: The file scanned as a list
-    data:
-      schedules:
-        - day_of_month: The day of the month of the schedule
-          day_of_week: The day of the week of the schedule
-          hour: The hour of the schedule
-          minute: The minute of the schedule
-          month: The month of the schedule
-          timeframe: If specified as @yearly/hourly/reboot/monthly
-          command: The command to be run
-      variables:
-        - name: name of the variable
-          value: The value of the variable
-    path: The file that this information was parsed from
-allow:
-  path: The path to allow file
-  users: List of users in the allow file
-deny:
-  path: The path to the deny file
-  users: List of users in the deny file
-files:
-  - name: The file name scanned
-    user:
-    group:
-    permissions:
+# TODO
 '''
 
 from ansible_collections.ansible_fact.os_facts.plugins.module_utils.fact_gatherer import FactGatherer
